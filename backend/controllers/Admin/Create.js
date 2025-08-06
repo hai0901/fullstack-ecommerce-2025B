@@ -1,10 +1,10 @@
-const DistributionHub = require('../../models/DistributionHub');
+const Admin = require('../../models/Admin');
 
-exports.createDistributionHub = async (req, res) => {
+exports.createAdmin = async (req, res) => {
   try {
-    const hub = new DistributionHub(req.body);
-    await hub.save();
-    res.status(201).json(hub);
+    const admin = new Admin(req.body);
+    await admin.save();
+    res.status(201).json(admin);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

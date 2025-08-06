@@ -6,6 +6,7 @@ const flash = require('connect-flash');
 const passport = require('passport');
 const app = express();
 const PORT = process.env.PORT || 5000;
+const apiRoutes = require('./routes');
 
 // Load env variables
 require('dotenv').config();
@@ -29,10 +30,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
-// View engine (optional, if using EJS)
-app.set('view engine', 'ejs');
-
 // Routes
+app.use('/api', apiRoutes);
 // app.use('/auth', require('./routes/authRoutes'));
 // app.use('/products', require('./routes/productRoutes'));
 
