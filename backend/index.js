@@ -33,8 +33,8 @@ app.use(flash());
 app.set('view engine', 'ejs');
 
 // Routes
-app.use('/auth', require('./routes/authRoutes'));
-app.use('/products', require('./routes/productRoutes'));
+// app.use('/auth', require('./routes/authRoutes'));
+// app.use('/products', require('./routes/productRoutes'));
 
 app.get('/', (req, res) => {
   res.send('API is running');
