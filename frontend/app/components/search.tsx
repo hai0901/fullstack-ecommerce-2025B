@@ -35,7 +35,7 @@ export function NavBarSearch() {
         />
       </PopoverAnchor>
       <PopoverContent 
-        className="flex flex-col gap-0 w-2xl mt-3 text-popover-foreground text-sm p-1.5 cursor-default"
+        className="flex flex-col gap-0 w-2xl mt-3 text-popover-foreground text-sm p-1.5 cursor-default z-99"
         onOpenAutoFocus={(e) => e.preventDefault()}
         onPointerDownOutside={() => setOpenSearchPopover(false)}
       >

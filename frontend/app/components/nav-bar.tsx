@@ -17,7 +17,7 @@ export default function NavBar() {
   }, [theme]);
 
   return (
-    <div className="sticky flex flex-row place-content-center border-b">
+    <div className="z-99 sticky top-0 backdrop-blur-md flex flex-row place-content-center sc border-b">
       <header className="flex flex-row h-24 w-screen max-w-[1448px] p-6 items-center justify-between">
         <img
           ref={imgRef}
