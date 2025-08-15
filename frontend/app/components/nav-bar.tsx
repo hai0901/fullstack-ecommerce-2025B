@@ -4,23 +4,26 @@ import { Button } from "./ui/button";
 
 import { useTheme } from 'next-themes';
 import { ModeToggle } from "./mode-toggle";
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ShoppingCart } from "lucide-react";
 import { NavBarSearch } from "./search";
 import { Badge } from "./ui/badge";
+import { useBorderToggleOnScroll } from "~/hooks/use-border-toggle-on-scroll";
+import { cn } from "~/lib/utils";
 
 export default function NavBar() {
   const { theme } = useTheme();
-  const imgRef = useRef(null);
+  const logoRef = useRef(null);
+  const showBottomBorder = useBorderToggleOnScroll('shop');
   useEffect(() => {
-    imgRef.current!.src = theme === "dark" ? logoDark : logoLight;
+    logoRef.current!.src = theme === "dark" ? logoDark : logoLight;
   }, [theme]);
 
   return (
-    <div className="z-99 sticky top-0 backdrop-blur-md flex flex-row place-content-center sc border-b">
+    <div className={cn("z-99 sticky top-0 backdrop-blur-md flex flex-row place-content-center", showBottomBorder && "border-b")}>
       <header className="flex flex-row h-24 w-screen max-w-[1448px] p-6 items-center justify-between">
         <img
-          ref={imgRef}
+          ref={logoRef}
           src={logoDark}
           width="120"
           height="20"
