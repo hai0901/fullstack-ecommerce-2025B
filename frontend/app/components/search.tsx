@@ -19,6 +19,7 @@ export function NavBarSearch() {
     setSearchKeyword(keyword);
   }
 
+
   const filteredResult = mockSearchResult.filter(item => item.name.toLowerCase().includes(searchKeyword.toLowerCase())).slice(0, 10);
 
   return (      

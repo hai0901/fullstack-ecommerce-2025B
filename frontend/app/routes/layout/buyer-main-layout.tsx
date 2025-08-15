@@ -4,7 +4,9 @@ import NavBar from "~/components/nav-bar";
 export default function BuyerMainLayout() {
   return (
     <>
-      <NavBar />
+      <div className="relative h-[996px]">
+        <NavBar />
+      </div>
       <Outlet />
     </>
   );

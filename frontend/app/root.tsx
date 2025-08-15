@@ -39,7 +39,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             enableSystem
             disableTransitionOnChange
         >
-        <body className="dark:bg-black bg-black h-screen">
+        <body className="dark:bg-black">
           {children}
         <ScrollRestoration />
         <Scripts />

@@ -7,7 +7,9 @@ export default function Hero() {
       w-[1000px] h-[800px]
       border-b border-r
       bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] 
-      bg-[size:100px_100px]"
+      bg-[size:100px_100px]
+      snap-start
+      "
     >
       <img className="z-0 absolute bottom-0" src={HeroGraphics} />
       <div className="flex flex-col border-t border-l items-center gap-6 p-12 bg-black col-start-3 col-span-6 row-start-1 row-span-3">
