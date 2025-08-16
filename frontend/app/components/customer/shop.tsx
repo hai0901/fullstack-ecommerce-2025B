@@ -14,7 +14,7 @@ export default function Shop() {
     <div id="shop" className="pt-24 snap-start w-full h-[fit] bg-black flex flex-col items-center border-t">
       <div className="flex flex-row w-[1448px]"> 
         <aside className="flex flex-col w-[418.5px] border h-auto text-muted-foreground">
-          <div className="p-6">
+          <div className="p-6 pr-7">
             <div className="flex flex-row justify-between">
               <Label className="font-normal">Surprise Me</Label>
               <Button variant="outline" size="icon">
