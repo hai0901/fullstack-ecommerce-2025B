@@ -35,13 +35,18 @@ export default function LoginPage() {
     <div className="w-screen h-screen">
       <div className="flex flex-row place-content-center">
         <header className="flex flex-row h-24 w-screen max-w-[1448px] p-6 items-center justify-between">
-          <img
-            src={logoDark}
-            width="120"
-            height="20"
-          />
+          <Link to="/">
+            <img
+              className="cursor-pointer"
+              src={logoDark}
+              width="96.82"
+              height="17.23"
+            />
+          </Link>
           <div className="flex flex-row gap-3">
-            <Button className="rounded-sm font-normal" size="sm">Sign Up</Button>
+            <Link to="signup">
+              <Button className="rounded-sm font-normal cursor-pointer" size="sm">Sign Up</Button>
+            </Link>
           </div>
         </header>
       </div>
@@ -79,7 +84,12 @@ export default function LoginPage() {
               <Button className="tracking-tight rounded-full gap-6" type="submit">Log in to your account</Button>            
             </form>
           </Form>
-          <p className="text-sm tracking-tight font-light">Don't have an account?<Button className="text-md font-normal" variant="link">Sign Up</Button></p>
+          <p className="text-sm tracking-tight font-light">
+            Don't have an account?
+            <Link to="/signup">
+              <Button className="text-md font-normal cursor-pointer" variant="link">Sign Up</Button>
+            </Link>
+          </p>
         </div>
       </main>
     </div>
