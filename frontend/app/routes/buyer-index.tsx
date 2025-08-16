@@ -8,48 +8,6 @@ export default function BuyerIndexPage() {
   <main className="scroll-smooth snap-y snap-mandatory top-24 absolute w-full h-screen overflow-y-scroll flex flex-col items-center">
     <Hero />
     <Shop />
-    <div className="snap-center flex flex-col w-full h-[500px] bg-red-500">
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-      <h1>Hi</h1>
-    </div>
   </main>
   );
 }
