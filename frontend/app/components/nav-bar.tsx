@@ -1,7 +1,16 @@
 import logoDark from "~/assets/neomall-darkmode-logo.svg";
-import logoLight from "~/assets/neomall-lightmode-logo.svg"
+import logoLight from "~/assets/neomall-lightmode-logo.svg";
 import { Button } from "./ui/button";
-
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "./ui/navigation-menu"
+import { Link } from "react-router";
 import { useTheme } from 'next-themes';
 import { ModeToggle } from "./mode-toggle";
 import { useState, useEffect, useRef } from "react";
@@ -29,6 +38,57 @@ export default function NavBar() {
           height="20"
         />
         <div className="flex flex-row w-full gap-3 pl-24 justify-center">
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuLink className="font-normal">
+                  About
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="font-normal">Join Us</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid gap-2 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
+                    <li>
+                      <NavigationMenuLink asChild>
+                        <a
+                          className="from-muted/50 to-muted flex h-full w-full flex-col justify-end bg-linear-to-b p-6 no-underline outline-hidden select-none focus:shadow-md"
+                          href="/"
+                        >
+                          <div className="mt-4 mb-2 text-lg font-medium">
+                            Vendor
+                          </div>
+                          <p className="text-muted-foreground text-sm leading-tight">
+                            Have your curios known and bought by our customers.
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                      <NavigationMenuLink asChild>
+                        <a
+                          className="from-muted/60 to-muted flex h-full w-full flex-col justify-end bg-linear-to-b p-6 no-underline outline-hidden select-none focus:shadow-md"
+                          href="/"
+                        >
+                          <div className="mt-4 mb-2 text-lg font-medium">
+                            Shipper
+                          </div>
+                          <p className="text-muted-foreground text-sm leading-tight">
+                            Delivery done right with Neomall.
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                    </li>                    
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink className="font-normal">
+                  FAQ
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
           <NavBarSearch />
           <Button variant="outline">
             <ShoppingCart size={32} />
@@ -37,10 +97,13 @@ export default function NavBar() {
         </div>
         <div className="flex flex-row gap-3">
           <ModeToggle />
-          <Button className="rounded-sm font-normal" size="sm" variant="outline">Log In</Button>
+          <Link to="/login"><Button className="rounded-sm font-normal" size="sm" variant="outline">Log In</Button></Link>
           <Button className="rounded-sm font-normal" size="sm">Sign Up</Button>
         </div>
       </header>
     </div>
   );
 }
+
+
+
