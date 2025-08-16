@@ -9,7 +9,7 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import { ThemeProvider } from 'next-themes';
+import { ThemeProvider } from './components/theme-provider';
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -33,18 +33,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-        >
-        <body className="dark:bg-black">
+      <body className="dark:bg-black">
+        <ThemeProvider defaultTheme="dark">
           {children}
-        <ScrollRestoration />
-        <Scripts />
+          <ScrollRestoration />
+          <Scripts />
+        </ThemeProvider>
       </body>
-      </ThemeProvider>
     </html>
   );
 }

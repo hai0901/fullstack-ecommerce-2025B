@@ -11,7 +11,7 @@ import {
   navigationMenuTriggerStyle,
 } from "./ui/navigation-menu"
 import { Link } from "react-router";
-import { useTheme } from 'next-themes';
+import { useTheme } from './theme-provider';
 import { ModeToggle } from "./mode-toggle";
 import { useState, useEffect, useRef } from "react";
 import { ShoppingCart } from "lucide-react";
@@ -31,18 +31,24 @@ export default function NavBar() {
   return (
     <div className={cn("z-99 sticky top-0 backdrop-blur-md flex flex-row place-content-center", showBottomBorder && "border-b")}>
       <header className="flex flex-row h-24 w-screen max-w-[1448px] p-6 items-center justify-between">
-        <img
-          ref={logoRef}
-          src={logoDark}
-          width="120"
-          height="20"
-        />
+        <Link to="/">
+          <img
+            ref={logoRef}
+            src={logoDark}
+            width="120"
+            height="20"
+            className="cursor-pointer hover:opacity-80 transition-opacity"
+            alt="Neomall Logo"
+          />
+        </Link>
         <div className="flex flex-row w-full gap-3 pl-24 justify-center">
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuLink className="font-normal">
-                  About
+                <NavigationMenuLink asChild>
+                  <Link to="/about" className="font-normal">
+                    About
+                  </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
@@ -83,8 +89,10 @@ export default function NavBar() {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuLink className="font-normal">
-                  FAQ
+                <NavigationMenuLink asChild>
+                  <Link to="/faq" className="font-normal">
+                    FAQ
+                  </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
             </NavigationMenuList>
