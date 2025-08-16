@@ -1,5 +1,5 @@
 import logoDark from "~/assets/neomall-darkmode-logo.svg";
-import logoLight from "~/assets/neomall-lightmode-logo.svg"
+import logoLight from "~/assets/neomall-lightmode-logo.svg";
 import { Button } from "./ui/button";
 import {
   NavigationMenu,
@@ -10,7 +10,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "./ui/navigation-menu"
-
+import { Link } from "react-router";
 import { useTheme } from 'next-themes';
 import { ModeToggle } from "./mode-toggle";
 import { useState, useEffect, useRef } from "react";
@@ -41,12 +41,12 @@ export default function NavBar() {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                <NavigationMenuLink className="font-normal">
                   About
                 </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuTrigger>Join Us</NavigationMenuTrigger>
+                <NavigationMenuTrigger className="font-normal">Join Us</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid gap-2 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
                     <li>
@@ -83,7 +83,7 @@ export default function NavBar() {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                <NavigationMenuLink className="font-normal">
                   FAQ
                 </NavigationMenuLink>
               </NavigationMenuItem>
@@ -97,7 +97,7 @@ export default function NavBar() {
         </div>
         <div className="flex flex-row gap-3">
           <ModeToggle />
-          <Button className="rounded-sm font-normal" size="sm" variant="outline">Log In</Button>
+          <Link to="/login"><Button className="rounded-sm font-normal" size="sm" variant="outline">Log In</Button></Link>
           <Button className="rounded-sm font-normal" size="sm">Sign Up</Button>
         </div>
       </header>
