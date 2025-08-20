@@ -1,13 +1,13 @@
 import { Dices, Info } from "lucide-react";
-import { Button } from "../ui/button";
-import { Label } from "../ui/label";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
-import { Input } from "../ui/input";
-import { Slider } from "../ui/slider";
-import { Separator } from "../ui/separator";
-import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
-import ShopProductCard from "./shop-product-card";
-import { Switch } from "../ui/switch";
+import { Button } from "~/components/ui/button";
+import { Label } from "~/components/ui/label";
+import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
+import { Input } from "~/components/ui/input";
+import { Slider } from "~/components/ui/slider";
+import { Separator } from "~/components/ui/separator";
+import { Tooltip, TooltipTrigger, TooltipContent } from "~/components/ui/tooltip";
+import ShopProductCard from "~/components/customer/shop-product-card";
+import { Switch } from "~/components/ui/switch";
 
 export default function Shop() {
   return (
@@ -73,6 +73,6 @@ export default function Shop() {
           </ScrollArea>
         </section>        
       </div>
-    </div>    
-  );
+    </div>  
+  )
 }

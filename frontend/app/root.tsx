@@ -42,10 +42,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         >
         <body className="dark:bg-black">
           {children}
-          <Footer />
-        <ScrollRestoration />
-        <Scripts />
-      </body>
+          <ScrollRestoration />
+          <Scripts />
+        </body>
       </ThemeProvider>
     </html>
   );
