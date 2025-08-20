@@ -11,14 +11,11 @@ import { Link } from "react-router";
 import { ShoppingCart } from "lucide-react";
 import { NavBarSearch } from "./search";
 import { Badge } from "./ui/badge";
-import { useBorderToggleOnScroll } from "~/hooks/use-border-toggle-on-scroll";
 import { cn } from "~/lib/utils";
 
 export default function NavBar() {
-  const showBottomBorder = useBorderToggleOnScroll('shop');
-
   return (
-    <div className={cn("z-99 sticky top-0 backdrop-blur-md flex flex-row place-content-center", showBottomBorder && "border-b")}>
+    <div className="z-99 sticky top-0 backdrop-blur-md flex flex-row place-content-center border-b">
       <header className="flex flex-row h-24 w-screen max-w-[1448px] p-6 items-center justify-between">
         <Link to="/">
           <img
@@ -29,30 +26,6 @@ export default function NavBar() {
           />
         </Link>
         <div className="flex flex-row w-full gap-3 pl-24 justify-center">
-          {/* <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuLink className="font-normal">
-                  About
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuLink className="font-normal">
-                  Privacy
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuLink className="font-normal">
-                  Copyright
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuLink className="font-normal">
-                  Help
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu> */}
           <NavBarSearch />
           <Button variant="ghost">
             <ShoppingCart size={32} />

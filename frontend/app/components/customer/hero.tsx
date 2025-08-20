@@ -1,6 +1,6 @@
 import { Button } from "~/components/ui/button";
 import HeroGraphics from "~/assets/hero-graphics.png";
-import { scrollToShop } from "~/lib/utils";
+import { Link } from "react-router";
 
 export default function Hero() {
   return (
@@ -15,7 +15,9 @@ export default function Hero() {
         <h1 className="z-1 text-5xl font-medium tracking-tight">Never shop boring again.</h1>
         <p className="z-1 text-muted-foreground w-100 text-center">Neomall turns shopping into discovery, offering only the most captivating products for people who want more than the ordinary.</p>
         <div className="z-1 flex flex-row gap-6">
-          <Button size="lg" className="rounded-full cursor-pointer" onClick={scrollToShop}>Start Shopping</Button>
+          <Link to="/shop">
+            <Button size="lg" className="rounded-full cursor-pointer">Start Shopping</Button>
+          </Link>
           <Button size="lg" className="rounded-full" variant="secondary">Become a Vendor</Button>
         </div>
       </div>
