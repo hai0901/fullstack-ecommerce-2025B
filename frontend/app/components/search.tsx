@@ -9,6 +9,7 @@ import {
 } from "~/components/ui/popover"
 import { Frown } from "lucide-react";
 import { scrollToShop } from "~/lib/utils";
+import { Search } from 'lucide-react';
 
 export function NavBarSearch() {
   const [openSearchPopover, setOpenSearchPopover] = useState(false);
@@ -31,9 +32,9 @@ export function NavBarSearch() {
         <Input 
           defaultValue={searchKeyword}
           placeholder="Get your 24K Labubu on Neomall now!" 
-          className="max-w-2xl" 
+          className="w-2xl" 
           onChange={handleSearchInputChange}
-          onClick={scrollToShop}
+          endIcon={<Search className="cursor-pointer" size={16}/>}
         />
       </PopoverAnchor>
       <PopoverContent 
