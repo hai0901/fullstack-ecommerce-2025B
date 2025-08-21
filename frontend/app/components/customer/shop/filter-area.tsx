@@ -20,7 +20,7 @@ export default function FilterArea() {
       <Category />
       <Separator />
 
-      <div className="p-6 pr-7">
+      {/* <div className="p-6 pr-7">
         <div className="flex flex-row justify-between">
           <Label className="font-normal">Surprise Me</Label>
           <Button variant="outline" size="icon">
@@ -34,7 +34,7 @@ export default function FilterArea() {
         <Label className="font-normal">B&W Mode</Label>
         <Switch id="bnw-mode" />
       </div>
-      <Separator />
+      <Separator /> */}
     </aside>
   )
 }
