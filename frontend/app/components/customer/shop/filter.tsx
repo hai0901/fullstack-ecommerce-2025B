@@ -1,22 +1,21 @@
 import { ChevronDown, ChevronUp, Dices, Info, Trash, X } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
-import { Separator } from "~/components/ui/separator";
-import { Switch } from "~/components/ui/switch";
-import PriceRange from "./price-range";
-import Category from "./category";
-import { useState } from "react";
 import { useAppSelector, useAppDispatch } from "~/hooks/redux-hooks";
-import { filterItemAdded, filterItemRemoved, clearFilterItems } from '~/features/filter/filterItemsSlice'
+import { filterItemRemoved, clearFilterItems } from '~/features/filter/filterItemsSlice'
 
 export default function Filter() {
   const filterItems = useAppSelector(state => state.filterItems);
   const dispatch = useAppDispatch();
 
   const renderedFilterItems = filterItems.map(item => {
-    function handleClick() {
-      dispatch(filterItemRemoved(item.id));
-    }
+    const formattedPriceRange = (priceRange: number[]) => {
+      const startPrice = priceRange[0] ? priceRange[0].toLocaleString('vi-VN') : "0";
+      const endPrice = priceRange[1] ? priceRange[1].toLocaleString('vi-VN') : "0";
+      return startPrice + " - " + endPrice + " VND";
+    } 
+
+    const description = item.id !== "priceRange" ? item.description : formattedPriceRange(item.description as number[]);
 
     return (
       <Button 
@@ -24,10 +23,10 @@ export default function Filter() {
         variant="outline" 
         className="w-fit font-normal text-xs"
       >
-        {item.description}
+        {description}
         <span 
           className="cursor-pointer"
-          onClick={handleClick}  
+          onClick={() => dispatch(filterItemRemoved(item.id))}  
         >
           <X size={16}/>
         </span>

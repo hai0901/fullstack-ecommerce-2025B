@@ -2,20 +2,25 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
 export interface FilterItem {
   id: string
-  description: string
+  description: string | number[]
 }
 
-const initialState: FilterItem[] = [
-  { id: '1', description: '50000 - 200000' },
-  { id: '2', description: 'Toys & Games' }
-]
+const initialState: FilterItem[] = [];
 
 const filterItemsSlice = createSlice({
   name: 'filterItems',
   initialState,
   reducers: {
     filterItemAdded(state, action: PayloadAction<FilterItem>) {
-      state.push(action.payload)
+      if (action.payload.id !== "priceRange") state.push(action.payload);
+      else {
+        const priceRangeItem = state.find(item => item.id === "priceRange");
+        if (priceRangeItem) {
+          priceRangeItem.description = action.payload.description;
+        } else {
+          state.push(action.payload);
+        }
+      }
     },
     filterItemRemoved(state, action: PayloadAction<string>) {
       return state.filter(item => item.id !== action.payload)
