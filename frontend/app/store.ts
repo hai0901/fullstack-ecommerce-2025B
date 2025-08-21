@@ -1,21 +1,12 @@
 import { configureStore, type Action } from '@reduxjs/toolkit'
-
-interface FilterItem {
-  description: string
-}
-
-type FilterItemsState = FilterItem[];
-
-function filterItemsReducer(state: FilterItemsState = [], action: Action) {
-  switch (action.type) {
-    default: {
-      return state
-    }
-  }
-}
+import filterItemsReducer from '~/features/filter/filterItemsSlice'
 
 export const store = configureStore({
   reducer: {
     filterItems: filterItemsReducer
   }
 })
+
+export type AppStore = typeof store
+export type AppDispatch = typeof store.dispatch
+export type RootState = ReturnType<typeof store.getState>
