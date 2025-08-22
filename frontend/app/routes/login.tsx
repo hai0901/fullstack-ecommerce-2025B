@@ -44,7 +44,7 @@ export default function LoginPage() {
             />
           </Link>
           <div className="flex flex-row gap-3">
-            <Link to="signup">
+            <Link to="/signup">
               <Button className="rounded-sm font-normal cursor-pointer" size="sm">Sign Up</Button>
             </Link>
           </div>

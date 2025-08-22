@@ -10,6 +10,7 @@ export default [
     index("routes/buyer-index.tsx"),
     route("/shop", "routes/shop.tsx")
   ]),  
-  route("playground", "routes/playground.tsx"),
-  route("login", "routes/login.tsx")
+  route("/playground", "routes/playground.tsx"),
+  route("/login", "routes/login.tsx"),
+  route("/signup", "routes/signup.tsx")
 ] satisfies RouteConfig;
