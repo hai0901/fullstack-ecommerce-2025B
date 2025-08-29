@@ -1,7 +1,6 @@
-import { Outlet } from "react-router";
+import { Outlet, useLocation } from "react-router";
 import Footer from "~/components/footer";
 import NavBar from "~/components/nav-bar";
-import Footer from "~/components/footer";
 
 export default function BuyerMainLayout() {
   const location = useLocation();
