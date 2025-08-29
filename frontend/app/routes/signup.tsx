@@ -30,6 +30,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {useDropzone} from 'react-dropzone';
 import { useRef, useCallback, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Label } from "~/components/ui/label";
+import { Input } from "~/components/ui/input";
+import ProfilePictureInput from "~/components/signup/profile-pic-input";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -47,23 +50,6 @@ const formSchema = z.object({
 // })
 
 export default function SignUpPage() {
-  const [avatarURL, setAvatarURL] = useState<string>("");
-  const onDrop = useCallback((acceptedFiles: any) => {
-    acceptedFiles.forEach((file: any) => {
-      const reader = new FileReader()
-
-      reader.onabort = () => console.log('file reading was aborted')
-      reader.onerror = () => console.log('file reading has failed')
-      reader.onload = () => {
-      // Do whatever you want with the file contents
-        const binaryStr = reader.result
-        setAvatarURL(binaryStr);
-      }
-      reader.readAsDataURL(file)
-    })
-  }, []);
-  const {getRootProps, getInputProps, isDragActive, acceptedFiles} = useDropzone({onDrop})
-
   return (
     <div className="w-screen h-screen">
       <div className="flex flex-row place-content-center">
@@ -118,29 +104,7 @@ export default function SignUpPage() {
                   </div>
                   <div className="grid gap-3">
                     <Label htmlFor="tabs-demo-username">Profile Picture</Label>
-                    {avatarURL ?
-                      <div className="flex place-content-center">
-                        <Avatar className="w-30 h-30 outline">
-                          <AvatarImage src={avatarURL} alt="avatar"/>
-                          <AvatarFallback>CN</AvatarFallback>
-                        </Avatar>
-                      </div>
-                      : 
-                      <div 
-                        className={cn("transition duration-150 flex flex-col items-center justify-center rounded-lg text-sm font-light w-full h-50 border text-muted-foreground cursor-pointer gap-3", isDragActive && "border-white")}
-                        {...getRootProps()}
-                      >
-                        <input {...getInputProps()} />
-                        <ImageUp size={32} color={isDragActive ? "white" : undefined} strokeWidth={1.5} className="transition duration-150" />
-                        {!isDragActive &&
-                          <>
-                            <p>Click to select an image to upload</p>
-                            <p>or</p>
-                            <p>Drag your chosen image here.</p>
-                          </>
-                        }
-                      </div>
-                    }
+                    <ProfilePictureInput />
                   </div>
                 </CardContent>
                 <CardFooter>
@@ -191,73 +155,5 @@ export default function SignUpPage() {
         </p> */}
       </main>
   </div>
-  )
-}
-
-import { AppWindowIcon, CodeIcon, ImageUp } from "lucide-react"
-import { Label } from "~/components/ui/label";
-import { Input } from "~/components/ui/input";
-import { cn } from "~/lib/utils";
-
-
-
-export function TabsDemo() {
-  return (
-    <div className="flex w-full max-w-sm flex-col gap-6">
-      <Tabs defaultValue="account">
-        <TabsList>
-          <TabsTrigger value="account">Account</TabsTrigger>
-          <TabsTrigger value="password">Password</TabsTrigger>
-        </TabsList>
-        <TabsContent value="account">
-          <Card>
-            <CardHeader>
-              <CardTitle>Account</CardTitle>
-              <CardDescription>
-                Make changes to your account here. Click save when you&apos;re
-                done.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-6">
-              <div className="grid gap-3">
-                <Label htmlFor="tabs-demo-name">Name</Label>
-                <Input id="tabs-demo-name" defaultValue="Pedro Duarte" />
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="tabs-demo-username">Username</Label>
-                <Input id="tabs-demo-username" defaultValue="@peduarte" />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button>Save changes</Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-        <TabsContent value="password">
-          <Card>
-            <CardHeader>
-              <CardTitle>Password</CardTitle>
-              <CardDescription>
-                Change your password here. After saving, you&apos;ll be logged
-                out.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-6">
-              <div className="grid gap-3">
-                <Label htmlFor="tabs-demo-current">Current password</Label>
-                <Input id="tabs-demo-current" type="password" />
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="tabs-demo-new">New password</Label>
-                <Input id="tabs-demo-new" type="password" />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button>Save password</Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
   )
 }
