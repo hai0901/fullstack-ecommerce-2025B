@@ -8,13 +8,10 @@ import { ImageUp } from "lucide-react";
 import Cropper from 'react-easy-crop';
 import getCroppedImgSrc from "~/lib/cropImage";
 
-export default function ProfilePictureInput() {
-  const [avatarURL, setAvatarURL] = useState("");
-  const [croppedImgURL, setCroppedImgURL] = useState("");
+export default function ProfilePictureInput({ avatarURL, setAvatarURL, croppedImgURL, setCroppedImgURL }: any) {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [noClick, setNoClick] = useState(false);
-
   const onDrop = useCallback((acceptedFiles: any) => {
     acceptedFiles.forEach((file: any) => {
       const reader = new FileReader()
@@ -28,17 +25,26 @@ export default function ProfilePictureInput() {
       reader.readAsDataURL(file)
     })
   }, []);
-
+  function fileTypeValidator(file: File) {
+    const allowedTypes = ["image/jpeg", "image/png"];
+    if (!allowedTypes.includes(file.type)) {
+      return {
+        code: "wrong-type",
+        message: "Only jpeg, jpg, and png files are accepted."
+      };
+    }
+    return null;
+  }
   const {
     getRootProps, 
     getInputProps, 
     isDragActive, 
     acceptedFiles, 
-    open
-  } = useDropzone({onDrop, noClick: noClick});
+    open,
+    fileRejections,
+  } = useDropzone({onDrop, noClick: noClick, validator: fileTypeValidator});
 
   const file = acceptedFiles[0];
-
   const onCropComplete = (croppedArea: any, croppedAreaPixels: any) => {
     const croppedImgSrc = getCroppedImgSrc(avatarURL, croppedAreaPixels);
     setCroppedImgURL(croppedImgSrc);
@@ -80,9 +86,14 @@ export default function ProfilePictureInput() {
                   cropShape="round"
                 />
               </div>
+              {fileRejections.length > 0 ? 
+                <p className="text-sm text-muted-foreground py-3">Please use .jpeg or .png files</p> 
+                : 
+                null
+              }
               <div className="flex gap-3">
                 <div {...getRootProps()} >
-                  <input accept="image/png, image/jpeg" {...getInputProps()} />
+                  <input {...getInputProps()} />
                   <Button variant="secondary" onClick={open}>Use a Different Image</Button>
                 </div>
                 <Button 
@@ -95,7 +106,8 @@ export default function ProfilePictureInput() {
           </DrawerContent>
         </Drawer>
       </div>
-      : 
+      :
+      <>
       <div 
         className={cn("transition duration-150 flex flex-col items-center justify-center rounded-lg text-sm font-light w-full h-50 border text-muted-foreground cursor-pointer gap-3", isDragActive && "border-white")}
         {...getRootProps()}
@@ -104,11 +116,18 @@ export default function ProfilePictureInput() {
         <ImageUp size={32} color={isDragActive ? "white" : undefined} strokeWidth={1.5} className="transition duration-150" />
         {!isDragActive &&
           <>
-            <p>Click to select an image to upload</p>
-            <p>or</p>
-            <p>Drag your chosen image here.</p>
+            {fileRejections.length > 0 ? 
+              <p>Please use .jpeg or .png files</p>
+              :
+              <>
+                <p>Click to select an image to upload</p>
+                <p>or</p>
+                <p>Drag your chosen image here.</p>
+              </>
+            }
           </>
         }
       </div>
+      </> 
   );
 }

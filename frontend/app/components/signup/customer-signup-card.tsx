@@ -9,6 +9,8 @@ import { Button } from "../ui/button";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { useDebouncedCallback } from 'use-debounce';
 
 async function isUsernameTaken(username: string): Promise<boolean> {
   const taken = ["admin", "test", "alice"]; // example existing usernames
@@ -38,19 +40,24 @@ const customerSignUpFormSchema = z.object({
     .string({message: "Please enter your name."})
     .min(8, {message: "Name must be at least 8 characters"}),
   address: z.string({message: "Please enter address."}),
-  // profilePicture: z
-  //   .file()
-  //   .mime(["image/png", "image/jpeg"], {message: "Profile picture must be a .png or .jpeg file."})
 })
+
+function onSubmit(values: z.infer<typeof customerSignUpFormSchema>) {
+  console.log(values)
+}
 
 export default function CustomerSignUpCard() {
   const customerSignUpForm = useForm<z.infer<typeof customerSignUpFormSchema>>({
-    resolver: zodResolver(customerSignUpFormSchema)
+    resolver: zodResolver(customerSignUpFormSchema),
   });
+  const [avatarURL, setAvatarURL] = useState("");
+  const [croppedImgURL, setCroppedImgURL] = useState("");
+  const validForm = Boolean(croppedImgURL ? croppedImgURL : avatarURL) && customerSignUpForm.formState.isValid;
 
-  function onSubmit(values: z.infer<typeof customerSignUpFormSchema>) {
-    console.log(values)
-  }
+  const usernameTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("username"), 500);
+  const passwordTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("password"), 500);
+  const nameTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("name"), 500);
+  const addressTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("address"), 500);
 
   return (
     <Card>
@@ -63,10 +70,15 @@ export default function CustomerSignUpCard() {
               render={({ field }) => (
                 <FormItem className="grid gap-3">
                   <Label>Username</Label>
-                  <FormControl>
-                    <Input {...field} placeholder="Username" />
+                  <FormControl 
+                    onChange={usernameTrigger}
+                  >
+                    <Input 
+                      {...field} 
+                      placeholder="Username" 
+                    />
                   </FormControl>
-                  <FormMessage/>
+                  {/* <FormMessage/> */}
                 </FormItem>
               )}
             />
@@ -78,7 +90,9 @@ export default function CustomerSignUpCard() {
                   <Label>Password</Label>
                   <Popover>
                     <PopoverTrigger>
-                      <FormControl>
+                      <FormControl
+                        onChange={passwordTrigger}
+                      >
                         <Input type="password" {...field} placeholder="Password" />
                       </FormControl>
                     </PopoverTrigger>
@@ -96,9 +110,7 @@ export default function CustomerSignUpCard() {
                         <li className={cn("transition", field.value?.match(/[0-9]/) && "text-white")}>One number</li>
                       </ul>
                     </PopoverContent>
-                  </Popover>
-                  
-                  
+                  </Popover> 
                   <FormMessage/>
                 </FormItem>
               )}
@@ -109,7 +121,9 @@ export default function CustomerSignUpCard() {
               render={({ field }) => (
                 <FormItem className="grid gap-3">
                   <Label>Name</Label>
-                  <FormControl>
+                  <FormControl
+                    onChange={nameTrigger}
+                  >
                     <Input {...field} placeholder="Name" />
                   </FormControl>
                   <FormMessage />
@@ -122,7 +136,9 @@ export default function CustomerSignUpCard() {
               render={({ field }) => (
                 <FormItem className="grid gap-3">
                   <Label>Address</Label>
-                  <FormControl>
+                  <FormControl
+                    onChange={addressTrigger}
+                  >
                     <Input {...field} placeholder="Address" />
                   </FormControl>
                   <FormMessage />
@@ -130,11 +146,16 @@ export default function CustomerSignUpCard() {
               )}
             />
             <div className="grid gap-3">
-              <Label htmlFor="tabs-demo-username">Profile Picture</Label>
-              <ProfilePictureInput />
+              <Label>Profile Picture</Label>
+              <ProfilePictureInput 
+                avatarURL={avatarURL}
+                setAvatarURL={setAvatarURL}
+                croppedImgURL={croppedImgURL}
+                setCroppedImgURL={setCroppedImgURL}
+              />
             </div>
             <Button
-              // disabled={!customerSignUpForm.formState.isValid}
+              disabled={!validForm}
               type="submit" 
               className="tracking-tight rounded-full gap-6 mx-auto"
             >
@@ -146,3 +167,5 @@ export default function CustomerSignUpCard() {
     </Card>
   );
 }
+
+//Username is validated in a debounced manner. 
