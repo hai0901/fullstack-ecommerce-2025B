@@ -32,5 +32,4 @@ const filterItemsSlice = createSlice({
 })
 
 export const { filterItemAdded, filterItemRemoved, clearFilterItems } = filterItemsSlice.actions;
-
-export default filterItemsSlice.reducer
+export default filterItemsSlice.reducer;

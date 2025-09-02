@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import logoDark from "~/assets/neomall-darkmode-logo.svg";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -13,9 +13,11 @@ import {
 } from "~/components/ui/form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useAppDispatch } from "~/hooks/redux-hooks";
+import { loginUser } from "~/features/authentication/authenticationSlice";
 
-const formSchema = z.object({
+const loginFormSchema = z.object({
   username: z.string().min(2, {
     message: "Username must be at least 2 characters.",
   }),
@@ -23,13 +25,35 @@ const formSchema = z.object({
 })
 
 export default function LoginPage() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof loginFormSchema>>({
+    resolver: zodResolver(loginFormSchema),
     defaultValues: {
       username: "",
       password: ""
     },
-  })
+  });
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const onSubmit = (values: z.infer<typeof loginFormSchema>) => {
+    //handle authentication here
+    if (values.username == "user" && values.password == "user") {
+      form.formState.errors.root?.type == "Authentication Error" && form.clearErrors();
+      dispatch(loginUser({ 
+        username: values.username,
+        name: values.username + "-" + "Name",
+        token: "mockToken",
+        role: "customer",
+      }));
+      navigate('/shop');
+    } else {
+      form.setError("root", {
+        type: "Authentication Error",
+        message: "Invalid username or password. Please try again."
+      })
+      console.log(form.formState.errors);
+    }
+  }
 
   return (
     <div className="w-screen h-screen">
@@ -54,7 +78,7 @@ export default function LoginPage() {
         <div className="flex flex-col border items-center justify-center p-12 gap-6 col-start-2 col-end-2">
           <h1 className="text-4xl tracking-tight">Welcome to Neomall</h1>
           <Form {...form}>
-            <form className="flex flex-col gap-6">
+            <form className="flex flex-col gap-6" onSubmit={form.handleSubmit(onSubmit)}>
               <div className="flex flex-col gap-3 w-80">
                 <FormField 
                   control={form.control}
@@ -74,13 +98,17 @@ export default function LoginPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Input placeholder="Password" {...field} />
+                        <Input type="password" placeholder="Password" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
+              { 
+                form.formState.errors.root?.type == "Authentication Error" &&
+                <p className="text-sm text-muted-foreground">Invalid username or password. Please try again.</p> 
+              }
               <Button className="tracking-tight rounded-full gap-6" type="submit">Log in to your account</Button>            
             </form>
           </Form>

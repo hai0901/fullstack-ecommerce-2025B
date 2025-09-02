@@ -120,8 +120,8 @@ export default function ShipperSignUpCard() {
                   <Label>Distribution Hub</Label>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your distribution hub" />
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select Your Distribution Hub" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="w-87.5">
