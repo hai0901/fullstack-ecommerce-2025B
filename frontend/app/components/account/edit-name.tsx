@@ -8,19 +8,19 @@ import { customerFormSchema } from "~/lib/schemas";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDebouncedCallback } from "use-debounce";
 
 export default function EditNameCard({ user, dispatch }: { user: User, dispatch: AppDispatch }) {
   const customerForm = useForm<z.infer<typeof customerFormSchema>>({
     resolver: zodResolver(customerFormSchema),
+    mode: "onChange",
     defaultValues: {
       name: user.name as string
     }
   });
-  const invalidForm = customerForm.getValues("name") === user.name || customerForm.getFieldState("name").invalid;
   const onSubmit = () => {
     console.log();
   }
+  const invalidForm = customerForm.watch("name") === user.name || customerForm.getFieldState("name", customerForm.formState).invalid; //Could have done by extending zod obj?
 
   return (
     <div className="flex p-6 pb-10 gap-6">
@@ -37,9 +37,7 @@ export default function EditNameCard({ user, dispatch }: { user: User, dispatch:
                   render={({ field }) => (
                     <Popover>
                       <PopoverTrigger>
-                        <FormControl
-                          onChange={() => customerForm.trigger("name")}
-                        >
+                        <FormControl>
                           <Input 
                             className="text-white"
                             {...field}
