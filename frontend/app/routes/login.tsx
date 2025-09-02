@@ -44,6 +44,7 @@ export default function LoginPage() {
         name: values.username + "-" + "Name",
         token: "mockToken",
         role: "customer",
+        profilePicture: null
       }));
       navigate('/shop');
     } else {
@@ -51,7 +52,6 @@ export default function LoginPage() {
         type: "Authentication Error",
         message: "Invalid username or password. Please try again."
       })
-      console.log(form.formState.errors);
     }
   }
 

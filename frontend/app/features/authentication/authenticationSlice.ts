@@ -6,6 +6,7 @@ export interface User {
   token: string | null
   isAuthenticated: boolean
   role: string | null
+  profilePicture: string | null
 }
 
 const initialState : User = {
@@ -13,7 +14,8 @@ const initialState : User = {
   name: null,
   token: null,
   isAuthenticated: false,
-  role: null
+  role: null,
+  profilePicture: null
 }
 
 const authSlice = createSlice({
@@ -26,6 +28,15 @@ const authSlice = createSlice({
       state.token = action.payload.token;
       state.isAuthenticated = true;
       state.role = action.payload.role;
+      state.profilePicture = action.payload.profilePicture;
+    },
+    logout(state) {
+      state.name = null;
+      state.username = null;
+      state.token = null;
+      state.role = null;
+      state.profilePicture = null;
+      state.isAuthenticated = false;
     },
     setUsername(state, action) {
       state.username = action.payload;
@@ -54,6 +65,7 @@ export const {
   setName, 
   setToken, 
   clearAuthState, 
-  authenticateUser 
+  authenticateUser,
+  logout 
 } = authSlice.actions;
 export default authSlice.reducer;
