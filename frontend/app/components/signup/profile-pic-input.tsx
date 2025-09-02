@@ -22,7 +22,7 @@ export default function ProfilePictureInput() {
       reader.onabort = () => console.log('file reading was aborted')
       reader.onerror = () => console.log('file reading has failed')
       reader.onload = () => {
-        const binaryStr = reader.result
+        const binaryStr = reader.result as string
         setAvatarURL(binaryStr as string);
       }
       reader.readAsDataURL(file)
@@ -48,7 +48,7 @@ export default function ProfilePictureInput() {
     avatarURL ?
       <div className="flex flex-col items-center place-content-center">
         <Avatar className="w-30 h-30 outline">
-          <AvatarImage src={croppedImgURL ? croppedImgURL : avatarURL} alt="avatar"/>
+          <AvatarImage src={croppedImgURL ? croppedImgURL : avatarURL} className="aspect-auto" alt="avatar"/>
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <Drawer 
@@ -82,7 +82,7 @@ export default function ProfilePictureInput() {
               </div>
               <div className="flex gap-3">
                 <div {...getRootProps()} >
-                  <input {...getInputProps()} />
+                  <input accept="image/png, image/jpeg" {...getInputProps()} />
                   <Button variant="secondary" onClick={open}>Use a Different Image</Button>
                 </div>
                 <Button 
@@ -100,7 +100,7 @@ export default function ProfilePictureInput() {
         className={cn("transition duration-150 flex flex-col items-center justify-center rounded-lg text-sm font-light w-full h-50 border text-muted-foreground cursor-pointer gap-3", isDragActive && "border-white")}
         {...getRootProps()}
       >
-        <input {...getInputProps()} />
+        <input accept="image/png, image/jpeg" {...getInputProps()} />
         <ImageUp size={32} color={isDragActive ? "white" : undefined} strokeWidth={1.5} className="transition duration-150" />
         {!isDragActive &&
           <>
