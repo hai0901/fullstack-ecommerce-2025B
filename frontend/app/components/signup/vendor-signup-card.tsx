@@ -11,14 +11,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useDebouncedCallback } from 'use-debounce';
-import { isUsernameTaken } from "~/lib/validations";
+import { isBusinessAddressTaken, isBusinessNameTaken, isUsernameTaken } from "~/lib/validations";
 
-const customerSignUpFormSchema = z.object({
+const vendorSignUpFormSchema = z.object({
   username: z
     .string({message: "Please enter username."})
-    .min(8, {message: "Username must be at least 8 characters."})
-    .max(15, {message: "Username must be at most 15 characters."})
-    .regex(/^[a-zA-Z0-9]+$/, {message: "Only letters and numbers are allowed."})
+    .min(2, {message: "Username must be at least 2 characters."})
+    .max(30, {message: "Username must be at most 30 characters."})
+    .regex(/^[a-zA-Z0-9._-]+$/, {message: "Only letters, numbers, ., _, - are allowed."})
     .refine(
       async (username) => !(await isUsernameTaken(username)),
       { message: "This username is already taken" }
@@ -27,43 +27,47 @@ const customerSignUpFormSchema = z.object({
   password: z
     .string({message: "Please enter password."})
     .min(8, {message: "Password must be at least 8 characters."})
-    .max(20, {message: "Password must be at most 20 characters."})
     .regex(/[a-z]/, {message: "Password must contain at least one lowercase letter"})
     .regex(/[A-Z]/, {message: "Password must contain at least one uppercase letter"})
     .regex(/[0-9]/, {message: "Password must contain at least one number"})
     .regex(/[^a-zA-Z0-9]/, {message: "Password must contain at least one special character"})
   ,
-  name: z
-    .string({message: "Please enter your name."})
-    .min(5, {message: "Name must be at least 5 characters"}),
-  address: z
+  businessName: z
+    .string({message: "Please enter the name of your business."})
+    .min(8, {message: "Name must be at least 8 characters"})
+    .refine(
+      async (businessName) => !(await isBusinessNameTaken(businessName))
+    ),
+  businessAddress: z
     .string({message: "Please enter address."})
-    .min(5, {message: "Address must be at least 5 characters"}),
+    .refine(
+      async (businessAddress) => !(await isBusinessAddressTaken(businessAddress))
+    ),
 })
 
-function onSubmit(values: z.infer<typeof customerSignUpFormSchema>) {
+function onSubmit(values: z.infer<typeof vendorSignUpFormSchema>) {
   console.log(values)
 }
 
-export default function CustomerSignUpCard() {
-  const customerSignUpForm = useForm<z.infer<typeof customerSignUpFormSchema>>({
-    resolver: zodResolver(customerSignUpFormSchema),
+export default function VendorSignUpCard() {
+  const vendorSignUpForm = useForm<z.infer<typeof vendorSignUpFormSchema>>({
+    resolver: zodResolver(vendorSignUpFormSchema),
   });
   const [avatarURL, setAvatarURL] = useState("");
   const [croppedImgURL, setCroppedImgURL] = useState("");
-  const validForm = Boolean(croppedImgURL ? croppedImgURL : avatarURL) && customerSignUpForm.formState.isValid;
-  const usernameTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("username"), 500);
-  const passwordTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("password"), 500);
-  const nameTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("name"), 500);
-  const addressTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("address"), 800);
+  const validForm = Boolean(croppedImgURL ? croppedImgURL : avatarURL) && vendorSignUpForm.formState.isValid;
+  const usernameTrigger = useDebouncedCallback(() => vendorSignUpForm.trigger("username"), 500);
+  const passwordTrigger = useDebouncedCallback(() => vendorSignUpForm.trigger("password"), 500);
+  const businessNameTrigger = useDebouncedCallback(() => vendorSignUpForm.trigger("businessName"), 500);
+  const businessAddressTrigger = useDebouncedCallback(() => vendorSignUpForm.trigger("businessAddress"), 800);
 
   return (
     <Card>
       <CardContent>
-        <Form {...customerSignUpForm}>
-          <form className="grid gap-6" onSubmit={customerSignUpForm.handleSubmit(onSubmit)}>
+        <Form {...vendorSignUpForm}>
+          <form className="grid gap-6" onSubmit={vendorSignUpForm.handleSubmit(onSubmit)}>
             <FormField 
-              control={customerSignUpForm.control}
+              control={vendorSignUpForm.control}
               name="username"
               render={({ field }) => (
                 <FormItem className="grid gap-3">
@@ -81,7 +85,7 @@ export default function CustomerSignUpCard() {
               )}
             />
             <FormField 
-              control={customerSignUpForm.control}
+              control={vendorSignUpForm.control}
               name="password"
               render={({ field }) => (
                 <FormItem className="grid gap-3">
@@ -114,30 +118,30 @@ export default function CustomerSignUpCard() {
               )}
             />
             <FormField 
-              control={customerSignUpForm.control}
-              name="name"
+              control={vendorSignUpForm.control}
+              name="businessName"
               render={({ field }) => (
                 <FormItem className="grid gap-3">
-                  <Label>Name</Label>
+                  <Label>Business Name</Label>
                   <FormControl
-                    onChange={nameTrigger}
+                    onChange={businessNameTrigger}
                   >
-                    <Input {...field} placeholder="Name" />
+                    <Input {...field} placeholder="Business Name" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <FormField 
-              control={customerSignUpForm.control}
-              name="address"
+              control={vendorSignUpForm.control}
+              name="businessAddress"
               render={({ field }) => (
                 <FormItem className="grid gap-3">
-                  <Label>Address</Label>
+                  <Label>Business Address</Label>
                   <FormControl
-                    onChange={addressTrigger}
+                    onChange={businessAddressTrigger}
                   >
-                    <Input {...field} placeholder="Address" />
+                    <Input {...field} placeholder="Business Address" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

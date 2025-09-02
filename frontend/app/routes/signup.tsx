@@ -8,6 +8,8 @@ import {
   TabsTrigger,
 } from "~/components/ui/tabs";
 import CustomerSignUpCard from "~/components/signup/customer-signup-card";
+import VendorSignUpCard from "~/components/signup/vendor-signup-card";
+import ShipperSignUpCard from "~/components/signup/shipper-signup-card";
 
 export default function SignUpPage() {
   return (
@@ -42,8 +44,12 @@ export default function SignUpPage() {
             <TabsContent className="w-100" value="customer">
               <CustomerSignUpCard />
             </TabsContent>
-            <TabsContent value="vendor"></TabsContent>
-            <TabsContent value="shipper"></TabsContent>
+            <TabsContent className="w-100" value="vendor">
+              <VendorSignUpCard />
+            </TabsContent>
+            <TabsContent className="w-100" value="shipper">
+              <ShipperSignUpCard />
+            </TabsContent>
           </Tabs>
         </div>
       </main>

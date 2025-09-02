@@ -12,13 +12,14 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useDebouncedCallback } from 'use-debounce';
 import { isUsernameTaken } from "~/lib/validations";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
-const customerSignUpFormSchema = z.object({
+const shipperSignUpFormSchema = z.object({
   username: z
     .string({message: "Please enter username."})
-    .min(8, {message: "Username must be at least 8 characters."})
-    .max(15, {message: "Username must be at most 15 characters."})
-    .regex(/^[a-zA-Z0-9]+$/, {message: "Only letters and numbers are allowed."})
+    .min(2, {message: "Username must be at least 2 characters."})
+    .max(30, {message: "Username must be at most 30 characters."})
+    .regex(/^[a-zA-Z0-9._-]+$/, {message: "Only letters, numbers, ., _, - are allowed."})
     .refine(
       async (username) => !(await isUsernameTaken(username)),
       { message: "This username is already taken" }
@@ -27,43 +28,41 @@ const customerSignUpFormSchema = z.object({
   password: z
     .string({message: "Please enter password."})
     .min(8, {message: "Password must be at least 8 characters."})
-    .max(20, {message: "Password must be at most 20 characters."})
     .regex(/[a-z]/, {message: "Password must contain at least one lowercase letter"})
     .regex(/[A-Z]/, {message: "Password must contain at least one uppercase letter"})
     .regex(/[0-9]/, {message: "Password must contain at least one number"})
     .regex(/[^a-zA-Z0-9]/, {message: "Password must contain at least one special character"})
   ,
-  name: z
-    .string({message: "Please enter your name."})
-    .min(5, {message: "Name must be at least 5 characters"}),
-  address: z
-    .string({message: "Please enter address."})
-    .min(5, {message: "Address must be at least 5 characters"}),
+  distributionHub: z
+    .literal(["hochiminh", "hanoi", "danang"])
 })
 
-function onSubmit(values: z.infer<typeof customerSignUpFormSchema>) {
+function onSubmit(values: z.infer<typeof shipperSignUpFormSchema>) {
   console.log(values)
 }
 
-export default function CustomerSignUpCard() {
-  const customerSignUpForm = useForm<z.infer<typeof customerSignUpFormSchema>>({
-    resolver: zodResolver(customerSignUpFormSchema),
+export default function ShipperSignUpCard() {
+  const shipperSignUpForm = useForm<z.infer<typeof shipperSignUpFormSchema>>({
+    resolver: zodResolver(shipperSignUpFormSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+      distributionHub: undefined
+    }
   });
   const [avatarURL, setAvatarURL] = useState("");
   const [croppedImgURL, setCroppedImgURL] = useState("");
-  const validForm = Boolean(croppedImgURL ? croppedImgURL : avatarURL) && customerSignUpForm.formState.isValid;
-  const usernameTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("username"), 500);
-  const passwordTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("password"), 500);
-  const nameTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("name"), 500);
-  const addressTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("address"), 800);
+  const validForm = Boolean(croppedImgURL ? croppedImgURL : avatarURL) && shipperSignUpForm.formState.isValid;
+  const usernameTrigger = useDebouncedCallback(() => shipperSignUpForm.trigger("username"), 500);
+  const passwordTrigger = useDebouncedCallback(() => shipperSignUpForm.trigger("password"), 500);
 
   return (
     <Card>
       <CardContent>
-        <Form {...customerSignUpForm}>
-          <form className="grid gap-6" onSubmit={customerSignUpForm.handleSubmit(onSubmit)}>
+        <Form {...shipperSignUpForm}>
+          <form className="grid gap-6" onSubmit={shipperSignUpForm.handleSubmit(onSubmit)}>
             <FormField 
-              control={customerSignUpForm.control}
+              control={shipperSignUpForm.control}
               name="username"
               render={({ field }) => (
                 <FormItem className="grid gap-3">
@@ -81,7 +80,7 @@ export default function CustomerSignUpCard() {
               )}
             />
             <FormField 
-              control={customerSignUpForm.control}
+              control={shipperSignUpForm.control}
               name="password"
               render={({ field }) => (
                 <FormItem className="grid gap-3">
@@ -114,31 +113,23 @@ export default function CustomerSignUpCard() {
               )}
             />
             <FormField 
-              control={customerSignUpForm.control}
-              name="name"
+              control={shipperSignUpForm.control}
+              name="distributionHub"
               render={({ field }) => (
                 <FormItem className="grid gap-3">
-                  <Label>Name</Label>
-                  <FormControl
-                    onChange={nameTrigger}
-                  >
-                    <Input {...field} placeholder="Name" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField 
-              control={customerSignUpForm.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem className="grid gap-3">
-                  <Label>Address</Label>
-                  <FormControl
-                    onChange={addressTrigger}
-                  >
-                    <Input {...field} placeholder="Address" />
-                  </FormControl>
+                  <Label>Distribution Hub</Label>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select your distribution hub" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="w-87.5">
+                        <SelectItem value="hochiminh">Ho Chi Minh</SelectItem>
+                        <SelectItem value="danang">Da Nang</SelectItem>
+                        <SelectItem value="hanoi">Ha Noi</SelectItem>
+                      </SelectContent>
+                    </Select>
                   <FormMessage />
                 </FormItem>
               )}
