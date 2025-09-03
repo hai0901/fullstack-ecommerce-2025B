@@ -7,6 +7,8 @@ export interface User {
   isAuthenticated: boolean
   role: string | null
   profilePicture: string | null
+  address: string | null
+  distributionHub: string | null
 }
 
 const initialState : User = {
@@ -15,7 +17,9 @@ const initialState : User = {
   token: null,
   isAuthenticated: false,
   role: null,
-  profilePicture: null
+  profilePicture: null,
+  address: null,
+  distributionHub: null
 }
 
 const authSlice = createSlice({
@@ -29,6 +33,7 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.role = action.payload.role;
       state.profilePicture = action.payload.profilePicture;
+      state.address = action.payload.address;
     },
     logout(state) {
       state.name = null;

@@ -43,8 +43,9 @@ export default function LoginPage() {
         username: values.username,
         name: values.username + "-" + "Name",
         token: "mockToken",
-        role: "customer",
-        profilePicture: null
+        role: "Customer",
+        profilePicture: null,
+        address: "174 Cau Dat, Ngo Quyen, HP, VN"
       }));
       navigate('/shop');
     } else {
