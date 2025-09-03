@@ -6,6 +6,11 @@ import { Badge } from "~/components/ui/badge"
 import { useAppDispatch, useAppSelector } from "~/hooks/redux-hooks";
 import EditAvatarCard from "~/components/account/edit-avatar";
 import EditNameCard from "~/components/account/edit-name";
+import EditUsermameCard from "~/components/account/edit-username";
+import EditAddressCard from "~/components/account/edit-address";
+import EditPassword from "~/components/account/edit-password";
+import { Link } from "react-router";
+import { logout } from "~/features/authentication/authenticationSlice";
 
 export default function AccountPage() {
   const user = useAppSelector(state => state.auth);
@@ -38,48 +43,18 @@ export default function AccountPage() {
         <div className="grid grid-cols-1 border divide-border divide-y-1">
           <EditAvatarCard user={user} dispatch={dispatch} />
           <EditNameCard user={user} dispatch={dispatch} />
-          <div className="flex p-6 pb-10 gap-6">
-            <div className="flex flex-col gap-6">
-              <h2 className="text-xl tracking-tight">Username</h2>
-              <div className="flex flex-col gap-3 font-light text-sm text-muted-foreground">
-                <p className="font-light">This is the name you use for signing in. All usernames in our system are unique.</p>
-                <div className="flex gap-3 w-full">
-                  <Input className="text-white" defaultValue={user.username as string} />
-                  <Button variant="outline">Save</Button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex p-6 pb-10 gap-6">
-            <div className="flex flex-col gap-6">
-              <h2 className="text-xl tracking-tight">Address</h2>
-              <div className="flex flex-col gap-3 font-light text-sm text-muted-foreground">
-                <p className="font-light">This is your address.</p>
-                <div className="flex gap-3 w-full">
-                <Input className="text-white" defaultValue={user.address as string} />
-                <Button variant="outline">Save</Button>
-                </div>
-              </div>
-            </div>
-          </div>    
-
-          <div className="flex p-6 pb-10 gap-6">
-            <div className="flex flex-col gap-6">
-              <h2 className="text-xl tracking-tight">Password</h2>
-              <div className="flex flex-col gap-3 font-light text-sm text-muted-foreground">
-                <p className="font-light">This is the password to your account. Please choose a password that adheres to the enlisted requirements to secure your account.</p>
-                <div className="flex gap-3 w-full">
-                <Input />
-                <Button variant="outline">Save</Button>
-                </div>
-              </div>
-            </div>
-          </div> 
+          <EditUsermameCard user={user} dispatch={dispatch} />
+          <EditAddressCard user={user} dispatch={dispatch} />
+          <EditPassword user={user} dispatch={dispatch} />
           <div className="flex p-6 pb-10 gap-6">
             <div className="flex flex-col gap-6">
               <h2 className="text-xl tracking-tight">Log Out</h2>
-              <Button>Click here to log out of your account</Button>
+              <Link 
+                to="/login"
+                onClick={() => dispatch(logout())}
+              >
+                <Button className="cursor-pointer">Click here to log out of your account</Button>
+              </Link>
             </div>
           </div>                   
         </div>
