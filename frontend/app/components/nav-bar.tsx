@@ -35,10 +35,12 @@ export default function NavBar() {
         </Link>
         <div className="flex flex-row w-full gap-3 pl-24 justify-center">
           <NavBarSearch />
-          <Button variant="ghost">
-            <ShoppingCart size={32} />
-            <Badge className="h-5 min-w-5 rounded-full p-0.5 font-mono tabular-nums">99</Badge>
-          </Button>
+          <Link to="/cart">
+            <Button variant="ghost" className="cursor-pointer">
+              <ShoppingCart size={32} />
+              <Badge className="h-5 min-w-5 rounded-full p-0.5 font-mono tabular-nums">99</Badge>
+            </Button>
+          </Link>
         </div>
         <div className="flex flex-row gap-3">
           {
