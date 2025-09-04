@@ -11,6 +11,28 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "~/components/ui/alert-dialog";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "~/components/ui/table";
+import { ScrollArea } from "~/components/ui/scroll-area"
 
 const mockImg = "https://cdn.vuahanghieu.com/unsafe/0x900/left/top/smart/filters:quality(90)/https://admin.vuahanghieu.com/upload/product/2024/08/moc-khoa-pop-mart-labubu-macaron-green-grape-mau-xanh-la-66b094ec488c7-05082024160132.jpg";
 
@@ -86,9 +108,178 @@ export default function CartPage() {
               </div>
             </CardContent>
             <CardFooter className="flex-col gap-2">
-              <Button type="submit" className="w-full cursor-pointer">
-                {"Checkout"}
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button type="submit" className="w-full cursor-pointer">
+                    {"Order"}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="h-150 max-w-[2000px] w-[800px]">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-center">Let's review your order</AlertDialogTitle>
+                    <AlertDialogDescription className="text-center">
+                      <Table>
+                        <TableBody>
+                          <ScrollArea className="h-100">
+                            <TableRow>
+                              <TableCell>
+                                <img className="w-16 h-16 rounded-md" src={mockImg} alt="Product Image" />
+                                Product Name
+                              </TableCell>
+                              <TableCell>
+                                Vendor Name
+                              </TableCell>
+                              <TableCell>
+                                10000
+                              </TableCell>
+                              <TableCell>
+                                1
+                              </TableCell>
+                              <TableCell>
+                                10000
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>
+                                <img className="w-16 h-16 rounded-md" src={mockImg} alt="Product Image" />
+                                Product Name
+                              </TableCell>
+                              <TableCell>
+                                Vendor Name
+                              </TableCell>
+                              <TableCell>
+                                10000
+                              </TableCell>
+                              <TableCell>
+                                1
+                              </TableCell>
+                              <TableCell>
+                                10000
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>
+                                <img className="w-16 h-16 rounded-md" src={mockImg} alt="Product Image" />
+                                Product Name
+                              </TableCell>
+                              <TableCell>
+                                Vendor Name
+                              </TableCell>
+                              <TableCell>
+                                10000
+                              </TableCell>
+                              <TableCell>
+                                1
+                              </TableCell>
+                              <TableCell>
+                                10000
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>
+                                <img className="w-16 h-16 rounded-md" src={mockImg} alt="Product Image" />
+                                Product Name
+                              </TableCell>
+                              <TableCell>
+                                Vendor Name
+                              </TableCell>
+                              <TableCell>
+                                10000
+                              </TableCell>
+                              <TableCell>
+                                1
+                              </TableCell>
+                              <TableCell>
+                                10000
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>
+                                <img className="w-16 h-16 rounded-md" src={mockImg} alt="Product Image" />
+                                Product Name
+                              </TableCell>
+                              <TableCell>
+                                Vendor Name
+                              </TableCell>
+                              <TableCell>
+                                10000
+                              </TableCell>
+                              <TableCell>
+                                1
+                              </TableCell>
+                              <TableCell>
+                                10000
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>
+                                <img className="w-16 h-16 rounded-md" src={mockImg} alt="Product Image" />
+                                Product Name
+                              </TableCell>
+                              <TableCell>
+                                Vendor Name
+                              </TableCell>
+                              <TableCell>
+                                10000
+                              </TableCell>
+                              <TableCell>
+                                1
+                              </TableCell>
+                              <TableCell>
+                                10000
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>
+                                <img className="w-16 h-16 rounded-md" src={mockImg} alt="Product Image" />
+                                Product Name
+                              </TableCell>
+                              <TableCell>
+                                Vendor Name
+                              </TableCell>
+                              <TableCell>
+                                10000
+                              </TableCell>
+                              <TableCell>
+                                1
+                              </TableCell>
+                              <TableCell>
+                                10000
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>
+                                <img className="w-16 h-16 rounded-md" src={mockImg} alt="Product Image" />
+                                Product Name
+                              </TableCell>
+                              <TableCell>
+                                Vendor Name
+                              </TableCell>
+                              <TableCell>
+                                10000
+                              </TableCell>
+                              <TableCell>
+                                1
+                              </TableCell>
+                              <TableCell>
+                                10000
+                              </TableCell>
+                            </TableRow> 
+                          </ScrollArea>                                                   
+                        </TableBody>
+                      </Table>
+                      <div className="flex justify-between py-6 px-4">
+                        <p>Total</p>
+                        <p>100000</p>
+                      </div>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className="flex justify-between">
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction>Place Order</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </CardFooter>
           </Card>
         </aside>
