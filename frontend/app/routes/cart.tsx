@@ -1,4 +1,4 @@
-import { Minus, Plus, Trash } from "lucide-react";
+import { CircleCheck, Minus, Plus, Trash } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Input } from "~/components/ui/input";
@@ -32,7 +32,17 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { ScrollArea } from "~/components/ui/scroll-area"
+import { ScrollArea } from "~/components/ui/scroll-area";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogClose,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog"
 
 const mockImg = "https://cdn.vuahanghieu.com/unsafe/0x900/left/top/smart/filters:quality(90)/https://admin.vuahanghieu.com/upload/product/2024/08/moc-khoa-pop-mart-labubu-macaron-green-grape-mau-xanh-la-66b094ec488c7-05082024160132.jpg";
 
@@ -116,7 +126,7 @@ export default function CartPage() {
                 </AlertDialogTrigger>
                 <AlertDialogContent className="h-150 max-w-[2000px] w-[800px]">
                   <AlertDialogHeader>
-                    <AlertDialogTitle className="text-center">Let's review your order</AlertDialogTitle>
+                    <AlertDialogTitle className="text-center tracking-tight">Let's review your order</AlertDialogTitle>
                     <AlertDialogDescription className="text-center">
                       <Table>
                         <TableBody>
@@ -284,6 +294,12 @@ export default function CartPage() {
           </Card>
         </aside>
       </section>
+      <Dialog defaultOpen={true}>
+        <DialogContent className="flex flex-col justify-center items-center text-center text-sm text-muted-foreground">
+          <CircleCheck size={60} color="#85d283" strokeWidth={1.5} />
+          Order successfully placed.<br></br>Thank you for shopping with Neomall!
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
