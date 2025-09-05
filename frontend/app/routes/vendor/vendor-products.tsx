@@ -3,7 +3,7 @@ import { Link, Outlet } from "react-router";
 import Footer from "~/components/footer";
 import NavBar from "~/components/nav-bar";
 import { columns, type Product } from "~/components/vendor/product-columns";
-import { ProductTable } from "~/components/vendor/product-table";
+import { DataTable } from "~/components/ui/data-table";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -55,7 +55,6 @@ export default function VendorProducts() {
         .some((v) => String(v).toLowerCase().includes(q))
     );
   }, [products, query]);
-  const [openCreateModal, setOpenCreateModal] = useState(false);
 
   return <>
     <NavBar />
@@ -67,7 +66,7 @@ export default function VendorProducts() {
         <p className="text-muted-foreground">Manage your Neomall products here.</p>
       </div>
       <div className="container mx-auto py-10">
-        <ProductTable
+        <DataTable
           columns={columns}
           data={filtered}
           renderToolbar={(table) => (

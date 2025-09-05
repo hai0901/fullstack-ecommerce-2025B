@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import {
   type ColumnDef,
@@ -30,17 +28,17 @@ import {
   SelectValue,
 } from "~/components/ui/select"
 
-interface ProductTableProps<TData, TValue> {
+interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   renderToolbar?: (table: TanTable<TData>) => React.ReactNode
 }
 
-export function ProductTable<TData, TValue>({
+export function DataTable<TData, TValue>({
   columns,
   data,
   renderToolbar,
-}: ProductTableProps<TData, TValue>) {
+}: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({})
 
