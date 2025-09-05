@@ -1,8 +1,11 @@
-import { useMemo, useState } from "react";
-import { Link, Outlet } from "react-router";
+import { Truck } from "lucide-react";
 import Footer from "~/components/footer";
 import NavBar from "~/components/nav-bar";
-import { columns, type Product } from "~/components/vendor/product-columns";
+import { Badge } from "~/components/ui/badge";
+import { useAppSelector } from "~/hooks/redux-hooks";
+import { useMemo, useState } from "react";
+import { Link } from "react-router";
+import { columns, type Order } from "~/components/shipper/order-columns";
 import { DataTable } from "~/components/ui/data-table";
 import {
   DropdownMenu,
@@ -16,55 +19,52 @@ import {
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { useAppSelector } from "~/hooks/redux-hooks";
 
-function getProducts(): Product[] {
+function getOrders(): Order[] {
   const now = new Date()
   return Array.from({ length: 30 }, (_, index) => {
     const idNum = (index + 1).toString().padStart(3, '0')
     const createdAt = new Date(now)
     createdAt.setDate(now.getDate() - (30 - index))
     const updatedAt = new Date(createdAt.getTime() + 1000 * 60 * 60 * 24)
-
     return {
-      id: `P-${idNum}`,
-      name: `Product ${index + 1}`,
-      category: ["Accessories", "Apparel", "Electronics", "Home", "Outdoors"][index % 5],
-      description: `Mock description for product ${index + 1}`,
-      // VND pricing: random between 50,000 and 5,000,000, rounded to nearest 1,000
-      price: Math.round((Math.random() * (5000000 - 50000) + 50000) / 1000) * 1000,
-      availableStock: Math.floor(Math.random() * 200),
-      image: `https://picsum.photos/seed/product-${index + 1}/300/300`,
+      id: `O-${idNum}`,
+      totalPrice: Math.round((Math.random() * (5000000 - 50000) + 50000) / 1000) * 1000,
+      products: [],
+      description: `Mock description for order ${index + 1}`,
+      customerName: `Customer ${index + 1}`,
+      address: `123 Mock St, City ${index + 1}`,
       createdAt,
       updatedAt,
-      isDeleted: false,
+      status: ['active', 'delivered', 'cancelled'][index % 3] as 'active' | 'delivered' | 'cancelled',
     }
   })
 }
 
-export default function VendorProducts() {
+export default function DeliveryPage() {
   const user = useAppSelector(state => state.auth);
-  const products = getProducts();
+  const orders = getOrders();
   const [query, setQuery] = useState("");
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return products;
-    return products.filter((p) =>
-      [p.id, p.name, p.category, p.description]
+    if (!q) return orders;
+    return orders.filter((o) =>
+      [o.id, o.customerName, o.description, o.address, o.status]
         .filter(Boolean)
         .some((v) => String(v).toLowerCase().includes(q))
     );
-  }, [products, query]);
+  }, [orders, query]);
 
   return <>
-    <NavBar />
-    <main>
-      <div className="w-full border-b px-42 py-10">
-        <h1 className="text-3xl font-medium tracking-tight w-200 mb-6">
-          {"Welcome back, " + user.name + "!"}
-        </h1>
-        <p className="text-muted-foreground">Manage your Neomall products here.</p>
-      </div>
+    <NavBar/>
+      <main>
+        <div className="w-full border-b px-42 py-10">
+          <h1 className="text-3xl font-medium tracking-tight w-200 mb-3">
+            {"Welcome back, " + user.name + "!"}
+          </h1>
+          <Badge className="mb-3"><Truck />{user.distributionHub}</Badge>
+          <p className="text-muted-foreground">Manage your Neomall distribution hub's orders here.</p>
+        </div>
       <div className="container mx-auto py-10">
         <DataTable
           columns={columns}
@@ -73,7 +73,7 @@ export default function VendorProducts() {
             <div className="flex items-center justify-between gap-3">
               <div className="max-w-sm w-full">
                 <Input
-                  placeholder="Filter Products..."
+                  placeholder="Filter Orders..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                 />
@@ -105,16 +105,12 @@ export default function VendorProducts() {
                       ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Link to="add-product">
-                  <Button>Add Product</Button>  
-                </Link>
               </div>
             </div>
           )}
         />
-      </div>
-      <Outlet/>
-    </main>
-    <Footer />
+      </div>        
+      </main>
+    <Footer/>
   </>
 }
