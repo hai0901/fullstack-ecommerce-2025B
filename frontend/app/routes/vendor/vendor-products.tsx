@@ -1,8 +1,21 @@
 import { Outlet } from "react-router";
+import { useMemo, useState } from "react";
 import Footer from "~/components/footer";
 import NavBar from "~/components/nav-bar";
 import { columns, type Product } from "~/components/vendor/product-columns";
 import { ProductTable } from "~/components/vendor/product-table";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import { SlidersHorizontal } from "lucide-react";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 
 function getProducts(): Product[] {
   const now = new Date()
@@ -30,6 +43,16 @@ function getProducts(): Product[] {
 
 export default function VendorProducts() {
   const products = getProducts();
+  const [query, setQuery] = useState("");
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return products;
+    return products.filter((p) =>
+      [p.id, p.name, p.category, p.description]
+        .filter(Boolean)
+        .some((v) => String(v).toLowerCase().includes(q))
+    );
+  }, [products, query]);
 
   return <>
     <NavBar />
@@ -40,7 +63,50 @@ export default function VendorProducts() {
         </h1>
       </div>
       <div className="container mx-auto py-10">
-        <ProductTable columns={columns} data={products} />
+        <ProductTable
+          columns={columns}
+          data={filtered}
+          renderToolbar={(table) => (
+            <div className="flex items-center justify-between gap-3">
+              <div className="max-w-sm w-full">
+                <Input
+                  placeholder="Filter Products..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <SlidersHorizontal className="size-4" /> View
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>Toggle Column</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {table
+                      .getAllLeafColumns()
+                      .filter((col) => col.id !== "actions")
+                      .map((col) => (
+                        <DropdownMenuCheckboxItem
+                          key={col.id}
+                          checked={col.getIsVisible()}
+                          onCheckedChange={(value) => col.toggleVisibility(Boolean(value))}
+                          disabled={!col.getCanHide?.()}
+                        >
+                          {typeof col.columnDef.header === "string"
+                            ? col.columnDef.header
+                            : (col.columnDef.meta as any)?.label ?? col.id.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/\b\w/g, (s) => s.toUpperCase())}
+                        </DropdownMenuCheckboxItem>
+                      ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Button onClick={() => console.log("add product")}>Add Product</Button>
+              </div>
+            </div>
+          )}
+        />
       </div>
       <Outlet/>
     </main>

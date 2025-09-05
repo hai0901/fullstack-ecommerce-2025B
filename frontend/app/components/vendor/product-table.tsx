@@ -4,6 +4,7 @@ import { useState } from "react"
 import {
   type ColumnDef,
   type SortingState,
+  type Table as TanTable,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
@@ -22,11 +23,13 @@ import {
 interface ProductTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  renderToolbar?: (table: TanTable<TData>) => React.ReactNode
 }
 
 export function ProductTable<TData, TValue>({
   columns,
   data,
+  renderToolbar,
 }: ProductTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({})
@@ -46,6 +49,11 @@ export function ProductTable<TData, TValue>({
 
   return (
     <div className="overflow-hidden rounded-md border">
+      {renderToolbar && (
+        <div className="p-3 border-b">
+          {renderToolbar(table)}
+        </div>
+      )}
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
