@@ -16,6 +16,7 @@ import {
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import { useAppSelector } from "~/hooks/redux-hooks";
 
 function getProducts(): Product[] {
   const now = new Date()
@@ -42,6 +43,7 @@ function getProducts(): Product[] {
 }
 
 export default function VendorProducts() {
+  const user = useAppSelector(state => state.auth);
   const products = getProducts();
   const [query, setQuery] = useState("");
   const filtered = useMemo(() => {
@@ -58,9 +60,10 @@ export default function VendorProducts() {
     <NavBar />
     <main>
       <div className="w-full border-b px-42 py-10">
-        <h1 className="text-3xl font-medium tracking-tight w-200">
-          My Products
+        <h1 className="text-3xl font-medium tracking-tight w-200 mb-6">
+          {"Welcome back, " + user.name + "!"}
         </h1>
+        <p className="text-muted-foreground">Manage your Neomall products here.</p>
       </div>
       <div className="container mx-auto py-10">
         <ProductTable
