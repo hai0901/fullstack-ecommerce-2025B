@@ -1,6 +1,7 @@
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import ShopProductCard from "~/components/customer/shop-product-card";
 import FilterArea from "~/components/customer/shop/filter-area";
+import { Outlet } from "react-router";
 
 export default function Shop() {
   return (
@@ -31,7 +32,8 @@ export default function Shop() {
             </div>
             <ScrollBar orientation="vertical" />
           </ScrollArea>
-        </section>        
+        </section>  
+        <Outlet/>      
       </div>
     </div>  
   )

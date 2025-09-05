@@ -8,7 +8,9 @@ import {
 export default [
   layout("routes/layout/buyer-main-layout.tsx", [
     index("routes/buyer-index.tsx"),
-    route("/shop", "routes/shop.tsx"),
+    route("/shop", "routes/shop.tsx", [
+      route(":productID", "routes/product.tsx")
+    ]),
     route("/cart", "routes/cart.tsx")
   ]),
   layout("routes/layout/authentication-layout.tsx", [
