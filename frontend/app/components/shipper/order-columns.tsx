@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { ChevronsUpDown, ArrowDown01, ArrowUp10, EyeOff, MoreHorizontal, ArrowUpAZ, ArrowDownZA } from "lucide-react"
+import { ChevronsUpDown, ArrowDown01, ArrowUp10, EyeOff, MoreHorizontal, ArrowUpAZ, ArrowDownZA, CircleDashed, CircleCheck } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -136,10 +136,39 @@ export const columns: ColumnDef<Order>[] = [
   {
     accessorKey: "status",
     meta: { label: "Status" },
-    header: () => <div className="font-normal text-muted-foreground">Status</div>,
+    header: ({ column }) => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm" className="h-7 px-2 text-muted-foreground inline-flex items-center gap-1">
+            Status <ChevronsUpDown className="size-4 text-muted-foreground" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          <DropdownMenuItem onClick={() => column.setFilterValue('active')}>
+            <CircleDashed className="size-4 mr-2" /> Active
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => column.setFilterValue('delivered')}>
+            <CircleCheck className="size-4 mr-2" /> Delivered
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => column.setFilterValue(undefined)}>
+            Show All
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
     cell: ({ row }) => {
       const status = row.getValue("status") as string
-      return <Badge>{status}</Badge>
+      const bg = status === 'active' ? 'bg-blue-800 text-white' 
+                : status === 'delivered' ? 'bg-green-800 text-white' 
+                : 'bg-red-100 text-red-800'
+      const statusLabel = status.charAt(0).toUpperCase() + status.slice(1)
+      return (
+        <Badge className={`rounded-full ${bg}`}>
+          {status === "active" && <CircleDashed />} 
+          {status === "delivered" && <CircleCheck />} 
+          {statusLabel}
+        </Badge>
+      )
     }
   },
   {
@@ -158,6 +187,9 @@ export const columns: ColumnDef<Order>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => console.log('view', order.id)}>
+              View Details
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => console.log('deliver', order.id)}>
               Deliver
             </DropdownMenuItem>

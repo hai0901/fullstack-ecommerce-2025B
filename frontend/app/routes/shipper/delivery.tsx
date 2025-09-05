@@ -73,7 +73,7 @@ export default function DeliveryPage() {
             <div className="flex items-center justify-between gap-3">
               <div className="max-w-sm w-full">
                 <Input
-                  placeholder="Filter Products..."
+                  placeholder="Filter Orders..."
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                 />
