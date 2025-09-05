@@ -48,6 +48,17 @@ export default function LoginPage() {
         address: "174 Cau Dat, Ngo Quyen, HP, VN"
       }));
       navigate('/shop');
+    } else if (values.username == "vendor" && values.password == "vendor") {
+      form.formState.errors.root?.type == "Authentication Error" && form.clearErrors();
+      dispatch(loginUser({ 
+        username: values.username,
+        name: values.username + "-" + "Name",
+        token: "mockToken",
+        role: "Vendor",
+        profilePicture: null,
+        address: "174 Cau Dat, Ngo Quyen, HP, VN"
+      }));
+      navigate('/my-products');
     } else {
       form.setError("root", {
         type: "Authentication Error",

@@ -7,11 +7,11 @@ import {
 
 export default [
   layout("routes/layout/buyer-main-layout.tsx", [
-    index("routes/buyer-index.tsx"),
-    route("/shop", "routes/shop.tsx", [
-      route(":productID", "routes/product.tsx")
+    index("routes/customer/buyer-index.tsx"),
+    route("/shop", "routes/customer/shop.tsx", [
+      route(":productID", "routes/customer/product.tsx")
     ]),
-    route("/cart", "routes/cart.tsx")
+    route("/cart", "routes/customer/cart.tsx")
   ]),
   layout("routes/layout/authentication-layout.tsx", [
     route("/login", "routes/login.tsx"),
@@ -20,5 +20,8 @@ export default [
   layout("routes/layout/global-layout.tsx", [
     route("/account", "routes/account.tsx"),  
     route("/playground", "routes/playground.tsx"),
-  ])
+  ]),
+  route("/my-products", "routes/vendor/vendor-products.tsx", [
+    route("add-product", "routes/vendor/add-product.tsx")
+  ]),
 ] satisfies RouteConfig;
