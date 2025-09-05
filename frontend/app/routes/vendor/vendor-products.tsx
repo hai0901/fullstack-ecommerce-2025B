@@ -1,4 +1,4 @@
-import { Outlet } from "react-router";
+import { Link, Outlet } from "react-router";
 import { useMemo, useState } from "react";
 import Footer from "~/components/footer";
 import NavBar from "~/components/nav-bar";
@@ -55,6 +55,7 @@ export default function VendorProducts() {
         .some((v) => String(v).toLowerCase().includes(q))
     );
   }, [products, query]);
+  const [openCreateModal, setOpenCreateModal] = useState(false);
 
   return <>
     <NavBar />
@@ -105,7 +106,9 @@ export default function VendorProducts() {
                       ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Button onClick={() => console.log("add product")}>Add Product</Button>
+                <Link to="add-product">
+                  <Button>Add Product</Button>  
+                </Link>
               </div>
             </div>
           )}
