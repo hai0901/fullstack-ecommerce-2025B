@@ -20,5 +20,8 @@ export default [
   layout("routes/layout/global-layout.tsx", [
     route("/account", "routes/account.tsx"),  
     route("/playground", "routes/playground.tsx"),
-  ])
+  ]),
+  route("/my-products", "routes/vendor/vendor-products.tsx", [
+    route("add-product", "routes/vendor/add-product.tsx")
+  ]),
 ] satisfies RouteConfig;
