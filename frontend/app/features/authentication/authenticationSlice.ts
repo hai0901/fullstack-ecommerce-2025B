@@ -34,6 +34,7 @@ const authSlice = createSlice({
       state.role = action.payload.role;
       state.profilePicture = action.payload.profilePicture;
       state.address = action.payload.address;
+      state.distributionHub = action.payload.distributionHub ? action.payload.distributionHub : null;
     },
     logout(state) {
       state.name = null;

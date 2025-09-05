@@ -1,5 +1,5 @@
-import { Link, Outlet } from "react-router";
 import { useMemo, useState } from "react";
+import { Link, Outlet } from "react-router";
 import Footer from "~/components/footer";
 import NavBar from "~/components/nav-bar";
 import { columns, type Product } from "~/components/vendor/product-columns";
