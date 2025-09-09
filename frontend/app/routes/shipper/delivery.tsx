@@ -4,7 +4,7 @@ import NavBar from "~/components/nav-bar";
 import { Badge } from "~/components/ui/badge";
 import { useAppSelector } from "~/hooks/redux-hooks";
 import { useMemo, useState } from "react";
-import { Link } from "react-router";
+import { Link, Outlet } from "react-router";
 import { columns, type Order } from "~/components/shipper/order-columns";
 import { DataTable } from "~/components/ui/data-table";
 import {
@@ -56,15 +56,15 @@ export default function DeliveryPage() {
   }, [orders, query]);
 
   return <>
-    <NavBar/>
-      <main>
-        <div className="w-full border-b px-42 py-10">
-          <h1 className="text-3xl font-medium tracking-tight w-200 mb-3">
-            {"Welcome back, " + user.name + "!"}
-          </h1>
-          <Badge className="mb-3"><Truck />{user.distributionHub}</Badge>
-          <p className="text-muted-foreground">Manage your Neomall distribution hub's orders here.</p>
-        </div>
+    <NavBar />
+    <main>
+      <div className="w-full border-b px-42 py-10">
+        <h1 className="text-3xl font-medium tracking-tight w-200 mb-3">
+          {"Welcome back, " + user.name + "!"}
+        </h1>
+        <Badge className="mb-3"><Truck />{user.distributionHub}</Badge>
+        <p className="text-muted-foreground">Manage your Neomall distribution hub's orders here.</p>
+      </div>
       <div className="container mx-auto py-10">
         <DataTable
           columns={columns}
@@ -109,8 +109,9 @@ export default function DeliveryPage() {
             </div>
           )}
         />
-      </div>        
-      </main>
-    <Footer/>
+      </div>
+      <Outlet />
+    </main>
+    <Footer />
   </>
 }

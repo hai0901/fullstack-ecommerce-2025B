@@ -9,6 +9,7 @@ import {
 import { Button } from "~/components/ui/button"
 import type { Product } from "../vendor/product-columns"
 import { Badge } from "../ui/badge"
+import { Link } from "react-router"
 
 export type Order = {
   id: string
@@ -188,7 +189,9 @@ export const columns: ColumnDef<Order>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => console.log('view', order.id)}>
-              View Details
+              <Link to={order.id}>
+               View Details
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => console.log('deliver', order.id)}>
               Deliver
