@@ -12,6 +12,7 @@ import { ThemeProvider } from 'next-themes';
 import { Provider } from 'react-redux';
 import { store } from './store';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "~/components/ui/sonner";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

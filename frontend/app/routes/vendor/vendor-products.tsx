@@ -57,7 +57,6 @@ export default function VendorProducts() {
   }, [products, query]);
 
   return <>
-    <NavBar />
     <main>
       <div className="w-full border-b px-42 py-10">
         <h1 className="text-3xl font-medium tracking-tight w-200 mb-6">
@@ -115,6 +114,5 @@ export default function VendorProducts() {
       </div>
       <Outlet/>
     </main>
-    <Footer />
   </>
 }
