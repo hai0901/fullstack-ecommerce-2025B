@@ -56,7 +56,6 @@ export default function DeliveryPage() {
   }, [orders, query]);
 
   return <>
-    <NavBar />
     <main>
       <div className="w-full border-b px-42 py-10">
         <h1 className="text-3xl font-medium tracking-tight w-200 mb-3">
@@ -112,6 +111,5 @@ export default function DeliveryPage() {
       </div>
       <Outlet />
     </main>
-    <Footer />
   </>
 }
