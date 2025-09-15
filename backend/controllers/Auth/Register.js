@@ -2,6 +2,7 @@ const User = require('../../models/User');
 const CustomerProfile = require('../../models/CustomerProfile');
 const VendorProfile = require('../../models/VendorProfile');
 const ShipperProfile = require('../../models/ShipperProfile');
+const DistributionHub = require('../../models/DistributionHub');
 const bcrypt = require('bcryptjs');
 const { signEmailToken } = require('../../utils/token');
 const { sendVerificationEmail } = require('../../utils/email');
@@ -12,7 +13,18 @@ const { sendVerificationEmail } = require('../../utils/email');
  */
 exports.register = async (req, res) => {
   try {
-    const { email, password, role, name, address, businessName, businessAddress, distributionHubId } = req.body || {};
+    const {
+      email,
+      password,
+      role,
+      name,
+      address,
+      businessName,
+      businessAddress,
+      distributionHubId,
+    } = req.body || {};
+
+    const profileImagePath = req.file?.filename || null;
 
     // basic validation
     if (!email || !password || !role) {
@@ -34,21 +46,57 @@ exports.register = async (req, res) => {
       return res.status(409).json({ error: 'Email already registered' });
     }
 
+    // Vendor: uniqueness + required fields
+    if (role === 'vendor') {
+      if (!businessName || !businessAddress) {
+        return res.status(400).json({ error: 'businessName and businessAddress are required for vendor' });
+      }
+      const existingName = await VendorProfile.findOne({ businessName });
+      if (existingName) return res.status(409).json({ error: 'Business name already used' });
+      const existingAddress = await VendorProfile.findOne({ businessAddress });
+      if (existingAddress) return res.status(409).json({ error: 'Business address already used' });
+    }
+
+    // Shipper: hub must exist
+    if (role === 'shipper') {
+      if (!distributionHubId) {
+        return res.status(400).json({ error: 'distributionHubId is required for shipper' });
+      }
+      const hub = await DistributionHub.findById(distributionHubId);
+      if (!hub) return res.status(400).json({ error: 'Invalid distribution hub ID' });
+    }
+
+    // Create User
     const passwordHash = await bcrypt.hash(password, 12);
     const user = await User.create({ email: normalizedEmail, passwordHash, role, isVerified: false });
 
-    // Create role-specific profile
+    // Role-specific profile
     let roleProfile = null;
     if (role === 'customer') {
-      if (!name || !address) return res.status(400).json({ error: 'name and address are required for customer' });
-      roleProfile = await CustomerProfile.create({ userId: user._id, name, address });
+      if (!name || !address) {
+        return res.status(400).json({ error: 'name and address are required for customer' });
+      }
+      roleProfile = await CustomerProfile.create({
+        userId: user._id,
+        name,
+        address,
+        profileImage: profileImagePath,
+      });
     } else if (role === 'vendor') {
-      if (!businessName || !businessAddress) return res.status(400).json({ error: 'businessName and businessAddress are required for vendor' });
-      roleProfile = await VendorProfile.create({ userId: user._id, businessName, businessAddress });
+      roleProfile = await VendorProfile.create({
+        userId: user._id,
+        businessName,
+        businessAddress,
+        profileImage: profileImagePath,
+      });
     } else if (role === 'shipper') {
-      if (!distributionHubId) return res.status(400).json({ error: 'distributionHubId is required for shipper' });
-      roleProfile = await ShipperProfile.create({ userId: user._id, distributionHubId });
+      roleProfile = await ShipperProfile.create({
+        userId: user._id,
+        distributionHubId,
+        profileImage: profileImagePath,
+      });
     }
+
     user.roleProfileId = roleProfile?._id;
     await user.save();
 
