@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 const shipperSchema = new Schema({
   username: { type: String, required: true },
-  distributionHubId: { type: Schema.Types.ObjectId, ref: 'DistributionHub', required: true },
+  distributionHub: { type: String, required: true, enum: ['Hanoi', 'Ho Chi Minh', 'Da Nang'] },
 }, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 shipperSchema.virtual('user', {
