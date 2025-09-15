@@ -17,6 +17,7 @@ import { cn } from "~/lib/utils";
 import { useAppDispatch, useAppSelector } from "~/hooks/redux-hooks";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { logout } from "~/features/authentication/authenticationSlice"; 
+import axios from "axios";
 
 export default function NavBar() {
   const user = useAppSelector(state => state.auth);
@@ -71,7 +72,12 @@ export default function NavBar() {
                       <NavigationMenuLink>
                         <Link 
                           className="flex gap-3 items-center" 
-                          onClick={() => dispatch(logout())}
+                          onClick={async () => {
+                            try {
+                              await axios.post('http://localhost:5000/api/auth/logout', {}, { withCredentials: true });
+                            } catch {}
+                            dispatch(logout());
+                          }}
                           to="/">
                           <LogOut />
                           Log Out

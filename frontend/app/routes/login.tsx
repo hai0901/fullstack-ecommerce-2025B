@@ -16,6 +16,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAppDispatch } from "~/hooks/redux-hooks";
 import { loginUser } from "~/features/authentication/authenticationSlice";
+import axios from "axios";
 
 const loginFormSchema = z.object({
   username: z.string().min(2, {
@@ -35,47 +36,37 @@ export default function LoginPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const onSubmit = (values: z.infer<typeof loginFormSchema>) => {
-    //handle authentication here
-    if (values.username == "user" && values.password == "user") {
-      form.formState.errors.root?.type == "Authentication Error" && form.clearErrors();
-      dispatch(loginUser({ 
+  const onSubmit = async (values: z.infer<typeof loginFormSchema>) => {
+    try {
+      const res = await axios.post('http://localhost:5000/api/auth/login', {
         username: values.username,
-        name: values.username + "-" + "Name",
-        token: "mockToken",
-        role: "Customer",
-        profilePicture: null,
-        address: "174 Cau Dat, Ngo Quyen, HP, VN"
-      }));
-      navigate('/shop');
-    } else if (values.username == "vendor" && values.password == "vendor") {
+        password: values.password
+      }, {
+        withCredentials: true
+      });
+
+      const data = res.data as { token: string, user: any };
+      const role = (data.user.role || '').toLowerCase();
       form.formState.errors.root?.type == "Authentication Error" && form.clearErrors();
-      dispatch(loginUser({ 
-        username: values.username,
-        name: values.username + "-" + "Name",
-        token: "mockToken",
-        role: "Vendor",
-        profilePicture: null,
-        address: "174 Cau Dat, Ngo Quyen, HP, VN"
+      dispatch(loginUser({
+        username: data.user.username,
+        name: data.user.name || data.user.businessName || data.user.username,
+        token: data.token,
+        role: role,
+        profilePicture: data.user.profilePicture || null,
+        address: data.user.address || null,
+        distributionHub: data.user.distributionHub || null
       }));
-      navigate('/my-products');
-    } else if (values.username == "shipper" && values.password == "shipper") {
-      form.formState.errors.root?.type == "Authentication Error" && form.clearErrors();
-      dispatch(loginUser({ 
-        username: values.username,
-        name: values.username + "-" + "Name",
-        token: "mockToken",
-        role: "Vendor",
-        profilePicture: null,
-        address: "174 Cau Dat, Ngo Quyen, HP, VN",
-        distributionHub: "Ho Chi Minh"
-      }));
-      navigate('/delivery');
-    } else {
+
+      if (role === 'customer') navigate('/shop');
+      else if (role === 'vendor') navigate('/my-products');
+      else if (role === 'shipper') navigate('/delivery');
+      else navigate('/');
+    } catch (err) {
       form.setError("root", {
         type: "Authentication Error",
         message: "Invalid username or password. Please try again."
-      })
+      });
     }
   }
 
