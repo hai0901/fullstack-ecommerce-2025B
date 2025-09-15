@@ -3,6 +3,7 @@ const CustomerProfile = require('../../models/CustomerProfile');
 const VendorProfile = require('../../models/VendorProfile');
 const ShipperProfile = require('../../models/ShipperProfile');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const fs = require('fs');
 const path = require('path');
@@ -61,7 +62,34 @@ exports.register = async (req, res) => {
     user.roleProfileId = roleProfile._id;
     await user.save();
 
-    res.status(201).json({ message: 'User registered successfully' });
+    // Load role-specific profile details for response
+    let profileData = {};
+    if (user.role === 'customer') {
+      profileData = { name: roleProfile.name, address: roleProfile.address };
+    } else if (user.role === 'vendor') {
+      profileData = { businessName: roleProfile.businessName, businessAddress: roleProfile.businessAddress };
+    } else if (user.role === 'shipper') {
+      profileData = { distributionHub: roleProfile.distributionHub };
+    }
+
+    // Generate JWT token
+    const tokenPayload = { sub: user._id.toString(), username: user.username, role: user.role };
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+    // Return login-style response with absolute profilePicture URL
+    const rawProfilePicture = user.profilePicture || null;
+    const isRelative = rawProfilePicture && rawProfilePicture.startsWith('/');
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+    res.status(201).json({
+      token,
+      user: {
+        username: user.username,
+        role: user.role,
+        profilePicture: isRelative ? `${baseUrl}${rawProfilePicture}` : rawProfilePicture,
+        ...profileData,
+      },
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

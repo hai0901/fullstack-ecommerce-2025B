@@ -12,6 +12,9 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useDebouncedCallback } from 'use-debounce';
 import { customerFormSchema } from "~/lib/schemas";
+import { useAppDispatch } from "~/hooks/redux-hooks";
+import { loginUser } from "~/features/authentication/authenticationSlice";
+import { useNavigate } from "react-router";
 
 export default function CustomerSignUpCard() {
   const customerSignUpForm = useForm<z.infer<typeof customerFormSchema>>({
@@ -24,6 +27,8 @@ export default function CustomerSignUpCard() {
   const passwordTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("password"), 500);
   const nameTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("name"), 500);
   const addressTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("address"), 800);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const onSubmit = async (values: z.infer<typeof customerFormSchema>) => {
     try {
@@ -41,7 +46,24 @@ export default function CustomerSignUpCard() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'Registration failed');
-      console.log('Registered:', data);
+      
+      // Auto-login after successful registration
+      const role = (data.user.role || '').toLowerCase();
+      dispatch(loginUser({
+        username: data.user.username,
+        name: data.user.name || data.user.businessName || data.user.username,
+        token: data.token,
+        role: role,
+        profilePicture: data.user.profilePicture || null,
+        address: data.user.address || null,
+        distributionHub: data.user.distributionHub || null
+      }));
+
+      // Navigate based on role
+      if (role === 'customer') navigate('/shop');
+      else if (role === 'vendor') navigate('/my-products');
+      else if (role === 'shipper') navigate('/delivery');
+      else navigate('/');
     } catch (err) {
       console.error(err);
     }

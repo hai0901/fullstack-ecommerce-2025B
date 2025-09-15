@@ -12,6 +12,9 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useDebouncedCallback } from 'use-debounce';
 import { isBusinessAddressTaken, isBusinessNameTaken, isUsernameTaken } from "~/lib/validations";
+import { useAppDispatch } from "~/hooks/redux-hooks";
+import { loginUser } from "~/features/authentication/authenticationSlice";
+import { useNavigate } from "react-router";
 
 const vendorSignUpFormSchema = z.object({
   username: z
@@ -58,6 +61,8 @@ export default function VendorSignUpCard() {
   const passwordTrigger = useDebouncedCallback(() => vendorSignUpForm.trigger("password"), 500);
   const businessNameTrigger = useDebouncedCallback(() => vendorSignUpForm.trigger("businessName"), 500);
   const businessAddressTrigger = useDebouncedCallback(() => vendorSignUpForm.trigger("businessAddress"), 800);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const onSubmit = async (values: z.infer<typeof vendorSignUpFormSchema>) => {
     try {
@@ -75,7 +80,24 @@ export default function VendorSignUpCard() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'Registration failed');
-      console.log('Registered:', data);
+      
+      // Auto-login after successful registration
+      const role = (data.user.role || '').toLowerCase();
+      dispatch(loginUser({
+        username: data.user.username,
+        name: data.user.name || data.user.businessName || data.user.username,
+        token: data.token,
+        role: role,
+        profilePicture: data.user.profilePicture || null,
+        address: data.user.address || null,
+        distributionHub: data.user.distributionHub || null
+      }));
+
+      // Navigate based on role
+      if (role === 'customer') navigate('/shop');
+      else if (role === 'vendor') navigate('/my-products');
+      else if (role === 'shipper') navigate('/delivery');
+      else navigate('/');
     } catch (err) {
       console.error(err);
     }

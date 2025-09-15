@@ -13,7 +13,7 @@ import ShipperSignUpCard from "~/components/signup/shipper-signup-card";
 
 export default function SignUpPage() {
   return (
-    <div className="w-screen h-screen">
+    <div className="w-screen min-h-screen flex flex-col">
       <div className="flex flex-row place-content-center">
         <header className="flex flex-row h-24 w-screen max-w-[1448px] p-6 items-center justify-between">
           <Link to="/">
@@ -31,7 +31,7 @@ export default function SignUpPage() {
           </div>
         </header>
       </div>
-      <main className="flex flex-col w-full h-full items-center">
+      <main className="flex flex-col w-full flex-1 items-center justify-center">
         <h1 className="text-4xl tracking-tight">Welcome to Neomall</h1>
         <h2 className="font-normal tracking-tight mt-2.5 text-muted-foreground">Create your new account as</h2>
         <div className="flex w-200 flex-col items-center gap-6 pb-6">

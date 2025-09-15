@@ -13,6 +13,9 @@ import { useState } from "react";
 import { useDebouncedCallback } from 'use-debounce';
 import { isUsernameTaken } from "~/lib/validations";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { useAppDispatch } from "~/hooks/redux-hooks";
+import { loginUser } from "~/features/authentication/authenticationSlice";
+import { useNavigate } from "react-router";
 
 const shipperSignUpFormSchema = z.object({
   username: z
@@ -53,6 +56,8 @@ export default function ShipperSignUpCard() {
   const validForm = Boolean(croppedImgURL ? croppedImgURL : avatarURL) && shipperSignUpForm.formState.isValid;
   const usernameTrigger = useDebouncedCallback(() => shipperSignUpForm.trigger("username"), 500);
   const passwordTrigger = useDebouncedCallback(() => shipperSignUpForm.trigger("password"), 500);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const onSubmit = async (values: z.infer<typeof shipperSignUpFormSchema>) => {
     try {
@@ -74,7 +79,24 @@ export default function ShipperSignUpCard() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || 'Registration failed');
-      console.log('Registered:', data);
+      
+      // Auto-login after successful registration
+      const role = (data.user.role || '').toLowerCase();
+      dispatch(loginUser({
+        username: data.user.username,
+        name: data.user.name || data.user.businessName || data.user.username,
+        token: data.token,
+        role: role,
+        profilePicture: data.user.profilePicture || null,
+        address: data.user.address || null,
+        distributionHub: data.user.distributionHub || null
+      }));
+
+      // Navigate based on role
+      if (role === 'customer') navigate('/shop');
+      else if (role === 'vendor') navigate('/my-products');
+      else if (role === 'shipper') navigate('/delivery');
+      else navigate('/');
     } catch (err) {
       console.error(err);
     }

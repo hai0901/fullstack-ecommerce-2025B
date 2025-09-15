@@ -6,8 +6,8 @@ import {
  } from "@react-router/dev/routes";
 
 export default [
+  route("/", "components/role-redirect.tsx"),
   layout("routes/layout/buyer-main-layout.tsx", [
-    index("routes/customer/buyer-index.tsx"),
     route("/shop", "routes/customer/shop.tsx", [
       route(":productID", "routes/customer/product.tsx")
     ]),
