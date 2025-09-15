@@ -4,8 +4,7 @@ const { Schema } = mongoose;
 const vendorSchema = new Schema({
   username: { type: String, required: true },
   businessName: { type: String, required: true },
-  businessAddress: { type: String, required: true },
-  taxId: { type: String }, // Optional future field
+  businessAddress: { type: String, required: true, unique: true },
 }, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 // Virtual populate: link by username -> User.username

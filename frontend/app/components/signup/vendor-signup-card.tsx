@@ -45,26 +45,7 @@ const vendorSignUpFormSchema = z.object({
     ),
 })
 
-async function onSubmit(values: z.infer<typeof vendorSignUpFormSchema>) {
-  try {
-    const res = await fetch('http://localhost:5000/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: values.username,
-        password: values.password,
-        role: 'vendor',
-        businessName: values.businessName,
-        businessAddress: values.businessAddress,
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || 'Registration failed');
-    console.log('Registered:', data);
-  } catch (err) {
-    console.error(err);
-  }
-}
+// submit will be defined inside the component to access avatar state
 
 export default function VendorSignUpCard() {
   const vendorSignUpForm = useForm<z.infer<typeof vendorSignUpFormSchema>>({
@@ -77,6 +58,28 @@ export default function VendorSignUpCard() {
   const passwordTrigger = useDebouncedCallback(() => vendorSignUpForm.trigger("password"), 500);
   const businessNameTrigger = useDebouncedCallback(() => vendorSignUpForm.trigger("businessName"), 500);
   const businessAddressTrigger = useDebouncedCallback(() => vendorSignUpForm.trigger("businessAddress"), 800);
+
+  const onSubmit = async (values: z.infer<typeof vendorSignUpFormSchema>) => {
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: values.username,
+          password: values.password,
+          role: 'vendor',
+          businessName: values.businessName,
+          businessAddress: values.businessAddress,
+          avatarDataUrl: (croppedImgURL || avatarURL) || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || 'Registration failed');
+      console.log('Registered:', data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <Card>

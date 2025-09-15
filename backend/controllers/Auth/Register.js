@@ -4,9 +4,12 @@ const VendorProfile = require('../../models/VendorProfile');
 const ShipperProfile = require('../../models/ShipperProfile');
 const bcrypt = require('bcryptjs');
 
+const fs = require('fs');
+const path = require('path');
+
 exports.register = async (req, res) => {
   try {
-    const { username, password, role, name, address, businessName, businessAddress, distributionHub } = req.body;
+    const { username, password, role, name, address, businessName, businessAddress, distributionHub, avatarDataUrl } = req.body;
 
     if (!username || !password || !role) {
       return res.status(400).json({ error: 'username, password and role are required' });
@@ -38,6 +41,21 @@ exports.register = async (req, res) => {
       roleProfile = await ShipperProfile.create({ username, distributionHub });
     } else {
       return res.status(400).json({ error: 'Invalid role' });
+    }
+
+    // Save avatar if provided
+    if (avatarDataUrl && typeof avatarDataUrl === 'string' && avatarDataUrl.startsWith('data:image/')) {
+      const matches = avatarDataUrl.match(/^data:image\/(png|jpeg|jpg);base64,(.+)$/);
+      if (matches && matches.length === 3) {
+        const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+        const buffer = Buffer.from(matches[2], 'base64');
+        const fileName = `${user._id}-${Date.now()}.${ext}`;
+        const uploadDir = path.join(__dirname, '../../uploads/avatars');
+        fs.mkdirSync(uploadDir, { recursive: true });
+        const filePath = path.join(uploadDir, fileName);
+        fs.writeFileSync(filePath, buffer);
+        user.profilePicture = `/uploads/avatars/${fileName}`;
+      }
     }
 
     user.roleProfileId = roleProfile._id;

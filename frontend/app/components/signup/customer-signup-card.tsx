@@ -13,27 +13,6 @@ import { useState } from "react";
 import { useDebouncedCallback } from 'use-debounce';
 import { customerFormSchema } from "~/lib/schemas";
 
-async function onSubmit(values: z.infer<typeof customerFormSchema>) {
-  try {
-    const res = await fetch('http://localhost:5000/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: values.username,
-        password: values.password,
-        role: 'customer',
-        name: values.name,
-        address: values.address,
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || 'Registration failed');
-    console.log('Registered:', data);
-  } catch (err) {
-    console.error(err);
-  }
-}
-
 export default function CustomerSignUpCard() {
   const customerSignUpForm = useForm<z.infer<typeof customerFormSchema>>({
     resolver: zodResolver(customerFormSchema),
@@ -45,6 +24,28 @@ export default function CustomerSignUpCard() {
   const passwordTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("password"), 500);
   const nameTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("name"), 500);
   const addressTrigger = useDebouncedCallback(() => customerSignUpForm.trigger("address"), 800);
+
+  const onSubmit = async (values: z.infer<typeof customerFormSchema>) => {
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: values.username,
+          password: values.password,
+          role: 'customer',
+          name: values.name,
+          address: values.address,
+          avatarDataUrl: (croppedImgURL || avatarURL) || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || 'Registration failed');
+      console.log('Registered:', data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <Card>

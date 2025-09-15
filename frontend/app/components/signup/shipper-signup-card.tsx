@@ -37,30 +37,7 @@ const shipperSignUpFormSchema = z.object({
     .literal(["hochiminh", "hanoi", "danang"])
 })
 
-async function onSubmit(values: z.infer<typeof shipperSignUpFormSchema>) {
-  try {
-    const hubMap: Record<string, string> = {
-      hochiminh: 'Ho Chi Minh',
-      hanoi: 'Hanoi',
-      danang: 'Da Nang',
-    };
-    const res = await fetch('http://localhost:5000/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: values.username,
-        password: values.password,
-        role: 'shipper',
-        distributionHub: hubMap[values.distributionHub as keyof typeof hubMap],
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || 'Registration failed');
-    console.log('Registered:', data);
-  } catch (err) {
-    console.error(err);
-  }
-}
+// submit will be defined inside the component to access avatar state
 
 export default function ShipperSignUpCard() {
   const shipperSignUpForm = useForm<z.infer<typeof shipperSignUpFormSchema>>({
@@ -76,6 +53,32 @@ export default function ShipperSignUpCard() {
   const validForm = Boolean(croppedImgURL ? croppedImgURL : avatarURL) && shipperSignUpForm.formState.isValid;
   const usernameTrigger = useDebouncedCallback(() => shipperSignUpForm.trigger("username"), 500);
   const passwordTrigger = useDebouncedCallback(() => shipperSignUpForm.trigger("password"), 500);
+
+  const onSubmit = async (values: z.infer<typeof shipperSignUpFormSchema>) => {
+    try {
+      const hubMap: Record<string, string> = {
+        hochiminh: 'Ho Chi Minh',
+        hanoi: 'Hanoi',
+        danang: 'Da Nang',
+      };
+      const res = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: values.username,
+          password: values.password,
+          role: 'shipper',
+          distributionHub: hubMap[values.distributionHub as keyof typeof hubMap],
+          avatarDataUrl: (croppedImgURL || avatarURL) || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || 'Registration failed');
+      console.log('Registered:', data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
     <Card>
