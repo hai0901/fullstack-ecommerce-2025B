@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useLocation } from "react-router";
 import logoDark from "~/assets/neomall-darkmode-logo.svg";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -35,6 +35,7 @@ export default function LoginPage() {
   });
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const onSubmit = async (values: z.infer<typeof loginFormSchema>) => {
     try {
@@ -58,10 +59,19 @@ export default function LoginPage() {
         distributionHub: data.user.distributionHub || null
       }));
 
-      if (role === 'customer') navigate('/shop');
-      else if (role === 'vendor') navigate('/my-products');
-      else if (role === 'shipper') navigate('/delivery');
-      else navigate('/');
+      // Check if there's a redirect path from the protected route
+      const from = location.state?.from;
+      
+      if (from) {
+        // Redirect to the originally requested page
+        navigate(from, { replace: true });
+      } else {
+        // Default role-based navigation
+        if (role === 'customer') navigate('/shop');
+        else if (role === 'vendor') navigate('/my-products');
+        else if (role === 'shipper') navigate('/delivery');
+        else navigate('/');
+      }
     } catch (err) {
       form.setError("root", {
         type: "Authentication Error",
