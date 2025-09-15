@@ -37,8 +37,29 @@ const shipperSignUpFormSchema = z.object({
     .literal(["hochiminh", "hanoi", "danang"])
 })
 
-function onSubmit(values: z.infer<typeof shipperSignUpFormSchema>) {
-  console.log(values)
+async function onSubmit(values: z.infer<typeof shipperSignUpFormSchema>) {
+  try {
+    const hubMap: Record<string, string> = {
+      hochiminh: 'Ho Chi Minh',
+      hanoi: 'Hanoi',
+      danang: 'Da Nang',
+    };
+    const res = await fetch('http://localhost:5000/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: values.username,
+        password: values.password,
+        role: 'shipper',
+        distributionHub: hubMap[values.distributionHub as keyof typeof hubMap],
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error || 'Registration failed');
+    console.log('Registered:', data);
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 export default function ShipperSignUpCard() {
@@ -144,7 +165,6 @@ export default function ShipperSignUpCard() {
               />
             </div>
             <Button
-              disabled={!validForm}
               type="submit" 
               className="tracking-tight rounded-full gap-6 mx-auto"
             >

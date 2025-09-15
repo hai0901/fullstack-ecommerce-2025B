@@ -13,8 +13,25 @@ import { useState } from "react";
 import { useDebouncedCallback } from 'use-debounce';
 import { customerFormSchema } from "~/lib/schemas";
 
-function onSubmit(values: z.infer<typeof customerFormSchema>) {
-  console.log(values)
+async function onSubmit(values: z.infer<typeof customerFormSchema>) {
+  try {
+    const res = await fetch('http://localhost:5000/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: values.username,
+        password: values.password,
+        role: 'customer',
+        name: values.name,
+        address: values.address,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error || 'Registration failed');
+    console.log('Registered:', data);
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 export default function CustomerSignUpCard() {
@@ -125,7 +142,7 @@ export default function CustomerSignUpCard() {
               />
             </div>
             <Button
-              disabled={!validForm}
+
               type="submit" 
               className="tracking-tight rounded-full gap-6 mx-auto"
             >

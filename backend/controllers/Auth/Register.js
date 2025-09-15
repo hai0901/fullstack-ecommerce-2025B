@@ -6,20 +6,36 @@ const bcrypt = require('bcryptjs');
 
 exports.register = async (req, res) => {
   try {
-    const { email, password, role, name, address, businessName, businessAddress, distributionHubId } = req.body;
+    const { username, password, role, name, address, businessName, businessAddress, distributionHub } = req.body;
+
+    if (!username || !password || !role) {
+      return res.status(400).json({ error: 'username, password and role are required' });
+    }
+
+    const existing = await User.findOne({ username });
+    if (existing) {
+      return res.status(409).json({ error: 'Username already exists' });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ email, passwordHash: hashedPassword, role });
+    const user = new User({ username, passwordHash: hashedPassword, role });
 
-    // Create role profile
     let roleProfile;
-
     if (role === 'customer') {
-      roleProfile = await CustomerProfile.create({ userId: user._id, name, address });
+      if (!name || !address) {
+        return res.status(400).json({ error: 'name and address are required for customer' });
+      }
+      roleProfile = await CustomerProfile.create({ username, name, address });
     } else if (role === 'vendor') {
-      roleProfile = await VendorProfile.create({ userId: user._id, businessName, businessAddress });
+      if (!businessName || !businessAddress) {
+        return res.status(400).json({ error: 'businessName and businessAddress are required for vendor' });
+      }
+      roleProfile = await VendorProfile.create({ username, businessName, businessAddress });
     } else if (role === 'shipper') {
-      roleProfile = await ShipperProfile.create({ userId: user._id, distributionHubId });
+      if (!distributionHub) {
+        return res.status(400).json({ error: 'distributionHub is required for shipper' });
+      }
+      roleProfile = await ShipperProfile.create({ username, distributionHub });
     } else {
       return res.status(400).json({ error: 'Invalid role' });
     }

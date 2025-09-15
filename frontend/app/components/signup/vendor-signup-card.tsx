@@ -45,8 +45,25 @@ const vendorSignUpFormSchema = z.object({
     ),
 })
 
-function onSubmit(values: z.infer<typeof vendorSignUpFormSchema>) {
-  console.log(values)
+async function onSubmit(values: z.infer<typeof vendorSignUpFormSchema>) {
+  try {
+    const res = await fetch('http://localhost:5000/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: values.username,
+        password: values.password,
+        role: 'vendor',
+        businessName: values.businessName,
+        businessAddress: values.businessAddress,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error || 'Registration failed');
+    console.log('Registered:', data);
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 export default function VendorSignUpCard() {
@@ -157,7 +174,6 @@ export default function VendorSignUpCard() {
               />
             </div>
             <Button
-              disabled={!validForm}
               type="submit" 
               className="tracking-tight rounded-full gap-6 mx-auto"
             >
