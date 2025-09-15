@@ -2,10 +2,18 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const vendorSchema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: 'User' },
+  username: { type: String, required: true },
   businessName: { type: String, required: true },
   businessAddress: { type: String, required: true },
   taxId: { type: String }, // Optional future field
+}, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
+
+// Virtual populate: link by username -> User.username
+vendorSchema.virtual('user', {
+  ref: 'User',
+  localField: 'username',
+  foreignField: 'username',
+  justOne: true,
 });
 
 module.exports = mongoose.model('VendorProfile', vendorSchema);

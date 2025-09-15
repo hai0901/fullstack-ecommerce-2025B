@@ -2,9 +2,15 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const shipperSchema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: 'User' },
+  username: { type: String, required: true },
   distributionHubId: { type: Schema.Types.ObjectId, ref: 'DistributionHub', required: true },
-  vehicleInfo: { type: String }, // Optional future-ready field
+}, { toJSON: { virtuals: true }, toObject: { virtuals: true } });
+
+shipperSchema.virtual('user', {
+  ref: 'User',
+  localField: 'username',
+  foreignField: 'username',
+  justOne: true,
 });
 
 module.exports = mongoose.model('ShipperProfile', shipperSchema);
