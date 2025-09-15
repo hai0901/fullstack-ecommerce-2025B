@@ -2,10 +2,27 @@ const Product = require('../../models/Product');
 
 exports.createProduct = async (req, res) => {
   try {
-    const product = new Product(req.body);
-    await product.save();
-    res.status(201).json(product);
+    if (req.auth.role !== 'vendor') {
+      return res.status(403).json({ error: 'Only vendors can create products' });
+    }
+
+    const vendorId = req.auth.uid;
+    const { name, price, description, genreId, availableStock } = req.body;
+    const image = req.file?.filename || null;
+
+    const newProduct = await Product.create({
+      name,
+      price,
+      description,
+      image,
+      genreId,
+      availableStock,
+      vendorId,
+    });
+
+    return res.status(201).json({ message: 'Product created', product: newProduct });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error('Create product error:', err);
+    res.status(500).json({ error: 'Server error' });
   }
 };
