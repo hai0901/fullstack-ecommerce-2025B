@@ -14,10 +14,8 @@ export type Product = {
   category: string
   description: string
   price: number
-  availableStock: number
-  createdAt: Date,
-  updatedAt: Date,
-  isDeleted: boolean,
+  createdAt: Date | string,
+  updatedAt: Date | string,
   image: string
 }
 
@@ -72,11 +70,6 @@ export const columns: ColumnDef<Product>[] = [
     },
   },
   {
-    accessorKey: "availableStock",
-    meta: { label: "Available Stock" },
-    header: () => <div className="font-normal text-muted-foreground">Available Stock</div>,
-  },
-  {
     accessorKey: "createdAt",
     sortingFn: "datetime",
     meta: { label: "Created At" },
@@ -112,11 +105,6 @@ export const columns: ColumnDef<Product>[] = [
       const formatted = `${dd}/${MM}/${yyyy} at ${hh}:${mm}`
       return <span className="tabular-nums">{formatted}</span>
     }
-  },
-  {
-    accessorKey: "isDeleted",
-    meta: { label: "Deleted" },
-    header: () => <div className="font-normal text-muted-foreground">Deleted</div>
   },
   {
     id: "actions",

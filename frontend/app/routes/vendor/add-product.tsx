@@ -1,5 +1,7 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "~/components/ui/button"
+import { useAppSelector } from "~/hooks/redux-hooks"
+import axios from "axios"
 import {
   Sheet,
   SheetContent,
@@ -22,29 +24,92 @@ import { Card, CardContent } from "~/components/ui/card"
 import { Upload, X } from "lucide-react"
 import { useLocation, useNavigate } from "react-router"
 
-const categories = [
-  "Accessories",
-  "Apparel", 
-  "Electronics",
-  "Home",
-  "Outdoors"
-]
+interface Category {
+  _id: string;
+  name: string;
+}
 
 export default function AddProduct() {
   const location = useLocation();
+  const user = useAppSelector(state => state.auth);
   const [formData, setFormData] = useState({
     name: "",
     category: "",
     description: "",
     price: "",
-    availableStock: "",
     image: ""
   })
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   let navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/categories');
+        setCategories(response.data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        // Fallback to some default categories if API fails
+        setCategories([
+          { _id: '1', name: 'Electronics' },
+          { _id: '2', name: 'Clothing' },
+          { _id: '3', name: 'Books' },
+          { _id: '4', name: 'Home & Garden' },
+          { _id: '5', name: 'Sports' }
+        ]);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
+    
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }))
+    }
+    
+    // Real-time validation
+    validateField(field, value)
+  }
+
+  const validateField = (field: string, value: string) => {
+    const newErrors = { ...errors }
+    
+    switch (field) {
+      case 'name':
+        if (value.length > 0 && (value.length < 10 || value.length > 20)) {
+          newErrors.name = 'Product name must be between 10 and 20 characters'
+        } else {
+          delete newErrors.name
+        }
+        break
+      case 'price':
+        const priceNum = parseFloat(value)
+        if (value.length > 0 && (isNaN(priceNum) || priceNum <= 0)) {
+          newErrors.price = 'Price must be a positive number'
+        } else {
+          delete newErrors.price
+        }
+        break
+      case 'description':
+        if (value.length > 500) {
+          newErrors.description = 'Description must be at most 500 characters'
+        } else {
+          delete newErrors.description
+        }
+        break
+    }
+    
+    setErrors(newErrors)
   }
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,23 +130,54 @@ export default function AddProduct() {
     setFormData(prev => ({ ...prev, image: "" }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: Implement actual product creation logic
-    console.log("Creating product:", formData)
-    // Reset form
-    setFormData({
-      name: "",
-      category: "",
-      description: "",
-      price: "",
-      availableStock: "",
-      image: ""
-    })
-    setImagePreview(null)
+    setIsSubmitting(true)
+    
+    try {
+      const response = await axios.post('http://localhost:5000/api/products', {
+        name: formData.name,
+        category: formData.category,
+        description: formData.description,
+        price: formData.price,
+        imageDataUrl: formData.image,
+        username: user.username
+      }, {
+        withCredentials: true
+      });
+
+      console.log("Product created successfully:", response.data)
+      
+      // Reset form
+      setFormData({
+        name: "",
+        category: "",
+        description: "",
+        price: "",
+        image: ""
+      })
+      setImagePreview(null)
+      
+      // Navigate back to products page with refresh flag
+      navigate("/my-products?refresh=true")
+    } catch (error) {
+      console.error("Error creating product:", error)
+      // You could add a toast notification here
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
-  const isFormValid = formData.name && formData.category && formData.description && formData.price && formData.availableStock
+  const isFormValid = formData.name && 
+    formData.category && 
+    formData.description && 
+    formData.price && 
+    formData.image &&
+    Object.keys(errors).length === 0 &&
+    formData.name.length >= 10 && 
+    formData.name.length <= 20 &&
+    parseFloat(formData.price) > 0 &&
+    formData.description.length <= 500
 
   return (
     <Sheet 
@@ -153,28 +249,42 @@ export default function AddProduct() {
             <Label htmlFor="name">Product Name *</Label>
             <Input
               id="name"
-              placeholder="Enter product name"
+              placeholder="Enter product name (10-20 characters)"
               value={formData.name}
               onChange={(e) => handleInputChange("name", e.target.value)}
               required
+              className={errors.name ? "border-red-500" : ""}
             />
+            {errors.name && (
+              <p className="text-sm text-red-500">{errors.name}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              {formData.name.length}/20 characters
+            </p>
           </div>
 
           {/* Category */}
           <div className="space-y-2">
             <Label htmlFor="category">Category *</Label>
-            <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a category" />
+            <Select 
+              value={formData.category} 
+              onValueChange={(value) => handleInputChange("category", value)}
+              disabled={loadingCategories}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={loadingCategories ? "Loading categories..." : "Select a category"} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-[9999] max-h-[200px] overflow-y-auto">
                 {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
+                  <SelectItem key={category._id} value={category.name}>
+                    {category.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            {loadingCategories && (
+              <p className="text-xs text-muted-foreground">Loading categories...</p>
+            )}
           </div>
 
           {/* Description */}
@@ -182,12 +292,19 @@ export default function AddProduct() {
             <Label htmlFor="description">Description *</Label>
             <Textarea
               id="description"
-              placeholder="Describe your product..."
+              placeholder="Describe your product... (max 500 characters)"
               value={formData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
               rows={4}
               required
+              className={errors.description ? "border-red-500" : ""}
             />
+            {errors.description && (
+              <p className="text-sm text-red-500">{errors.description}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              {formData.description.length}/500 characters
+            </p>
           </div>
 
           {/* Price */}
@@ -196,28 +313,19 @@ export default function AddProduct() {
             <Input
               id="price"
               type="number"
-              placeholder="Enter price in VND"
+              placeholder="Enter price in VND (positive number)"
               value={formData.price}
               onChange={(e) => handleInputChange("price", e.target.value)}
               min="0"
               step="1000"
               required
+              className={errors.price ? "border-red-500" : ""}
             />
+            {errors.price && (
+              <p className="text-sm text-red-500">{errors.price}</p>
+            )}
           </div>
 
-          {/* Available Stock */}
-          <div className="space-y-2">
-            <Label htmlFor="availableStock">Available Stock *</Label>
-            <Input
-              id="availableStock"
-              type="number"
-              placeholder="Enter available quantity"
-              value={formData.availableStock}
-              onChange={(e) => handleInputChange("availableStock", e.target.value)}
-              min="0"
-              required
-            />
-          </div>
         </form>
 
         <SheetFooter className="flex gap-2 p-0">
@@ -227,9 +335,9 @@ export default function AddProduct() {
           <Button 
             type="submit" 
             onClick={handleSubmit}
-            disabled={!isFormValid}
+            disabled={!isFormValid || isSubmitting}
           >
-            Create Product
+            {isSubmitting ? "Creating..." : "Create Product"}
           </Button>
         </SheetFooter>
       </SheetContent>

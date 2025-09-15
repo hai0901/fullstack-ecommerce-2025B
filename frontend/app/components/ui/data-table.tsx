@@ -104,7 +104,10 @@ export function DataTable<TData, TValue>({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                <div className="flex flex-col items-center justify-center space-y-2">
+                  <p className="text-muted-foreground">No results.</p>
+                  <p className="text-sm text-muted-foreground">Publish your first product with Neomall.</p>
+                </div>
               </TableCell>
             </TableRow>
           )}

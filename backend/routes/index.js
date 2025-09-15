@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 router.use('/auth', require('./Auth'));
-router.use('/genres', require('./Genre'));
+router.use('/categories', require('./Category'));
 router.use('/products', require('./Product'));
 router.use('/reviews', require('./Review'));
 router.use('/orders', require('./Order'));
