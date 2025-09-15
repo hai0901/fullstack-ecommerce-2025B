@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
+import { SlidersHorizontal, ChevronLeft, ChevronRight, Check, ChevronDown } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { useAppSelector } from "~/hooks/redux-hooks";
@@ -44,11 +44,12 @@ export default function VendorProducts() {
     hasPrev: false
   });
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
 
   const fetchProducts = async (page = 1, search = "", cat = "") => {
     try {
@@ -57,7 +58,7 @@ export default function VendorProducts() {
       
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: '10',
+        limit: '1000', // Fetch all products for client-side filtering
         ...(search && { search }),
         ...(cat && { category: cat })
       });
@@ -67,7 +68,7 @@ export default function VendorProducts() {
         { withCredentials: true }
       );
 
-      setProducts(response.data.products);
+      setAllProducts(response.data.products);
       setPagination(response.data.pagination);
     } catch (err) {
       console.error("Error fetching products:", err);
@@ -95,9 +96,9 @@ export default function VendorProducts() {
 
   useEffect(() => {
     if (user.isAuthenticated) {
-      fetchProducts(1, query, category);
+      fetchProducts(1, "", "");
     }
-  }, [user.isAuthenticated, query, category]);
+  }, [user.isAuthenticated]);
 
   // Handle refresh from add product
   useEffect(() => {
@@ -105,23 +106,81 @@ export default function VendorProducts() {
       // Clear the refresh parameter
       setSearchParams({});
       // Reload products
-      fetchProducts(1, query, category);
+      fetchProducts(1, "", "");
     }
   }, [searchParams]);
+
+  // Client-side filtering
+  const filteredProducts = useMemo(() => {
+    let filtered = allProducts;
+
+    // Filter by search query
+    if (query.trim()) {
+      const searchTerm = query.trim().toLowerCase();
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(searchTerm) ||
+        product.description.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    // Filter by categories (multiple selection)
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter(product => selectedCategories.includes(product.category));
+    }
+
+    return filtered;
+  }, [allProducts, query, selectedCategories]);
+
+  // Paginate filtered results
+  const paginatedProducts = useMemo(() => {
+    const pageSize = 10;
+    const startIndex = (pagination.currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return filteredProducts.slice(startIndex, endIndex);
+  }, [filteredProducts, pagination.currentPage]);
+
+  // Update pagination info based on filtered results
+  const updatedPagination = useMemo(() => {
+    const pageSize = 10;
+    const totalPages = Math.ceil(filteredProducts.length / pageSize);
+    return {
+      ...pagination,
+      totalPages,
+      totalProducts: filteredProducts.length,
+      hasNext: pagination.currentPage < totalPages,
+      hasPrev: pagination.currentPage > 1
+    };
+  }, [filteredProducts.length, pagination.currentPage]);
 
   const handleSearch = (value: string) => {
     setQuery(value);
     setPagination(prev => ({ ...prev, currentPage: 1 }));
   };
 
-  const handleCategoryFilter = (value: string) => {
-    setCategory(value);
+  const handleCategoryToggle = (categoryName: string) => {
+    setSelectedCategories(prev => {
+      if (prev.includes(categoryName)) {
+        // Remove category if already selected
+        return prev.filter(cat => cat !== categoryName);
+      } else {
+        // Add category if not selected
+        return [...prev, categoryName];
+      }
+    });
     setPagination(prev => ({ ...prev, currentPage: 1 }));
   };
 
-  const handlePageChange = (newPage: number) => {
-    fetchProducts(newPage, query, category);
+  const handleSelectAllCategories = () => {
+    if (selectedCategories.length === categories.length) {
+      // If all categories are selected, clear selection (show all)
+      setSelectedCategories([]);
+    } else {
+      // Select all categories
+      setSelectedCategories(categories.map(cat => cat.name));
+    }
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
   };
+
 
   if (loading) {
     return (
@@ -154,7 +213,7 @@ export default function VendorProducts() {
         <div className="container mx-auto py-10 flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-500 mb-4">{error}</p>
-            <Button onClick={() => fetchProducts(1, query, category)}>
+            <Button onClick={() => fetchProducts(1, "", "")}>
               Try Again
             </Button>
           </div>
@@ -175,7 +234,7 @@ export default function VendorProducts() {
         <div className="flex-1 flex flex-col">
             <DataTable
               columns={columns}
-              data={products}
+              data={paginatedProducts}
           renderToolbar={(table) => (
             <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
@@ -186,21 +245,47 @@ export default function VendorProducts() {
                       onChange={(e) => handleSearch(e.target.value)}
                     />
                   </div>
-                  <select
-                    value={category}
-                    onChange={(e) => handleCategoryFilter(e.target.value)}
-                    className="px-3 py-2 border rounded-md bg-background"
-                    disabled={loadingCategories}
-                  >
-                    <option value="">
-                      {loadingCategories ? "Loading categories..." : "All Categories"}
-                    </option>
-                    {categories.map((cat) => (
-                      <option key={cat._id} value={cat.name}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        className="w-[200px] justify-between"
+                        disabled={loadingCategories}
+                      >
+                        {loadingCategories 
+                          ? "Loading..." 
+                          : selectedCategories.length === 0 
+                            ? "All Categories" 
+                            : selectedCategories.length === categories.length
+                              ? "All Categories"
+                              : `Selected Categories (${selectedCategories.length})`
+                        }
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-[200px]">
+                      <DropdownMenuLabel>Filter by Category</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleSelectAllCategories}>
+                        <Check 
+                          className={`mr-2 h-4 w-4 ${
+                            selectedCategories.length === categories.length ? 'opacity-100' : 'opacity-0'
+                          }`} 
+                        />
+                        All Categories
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      {categories.map((cat) => (
+                        <DropdownMenuCheckboxItem
+                          key={cat._id}
+                          checked={selectedCategories.includes(cat.name)}
+                          onCheckedChange={() => handleCategoryToggle(cat.name)}
+                        >
+                          {cat.name}
+                        </DropdownMenuCheckboxItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
               </div>
               <div className="flex items-center gap-2">
                 <DropdownMenu>
@@ -230,7 +315,7 @@ export default function VendorProducts() {
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Link to="add-product">
-                  <Button>Add Product</Button>  
+                  <Button size="sm">Add Product</Button>  
                 </Link>
               </div>
             </div>
@@ -238,29 +323,29 @@ export default function VendorProducts() {
         />
           
           {/* Pagination */}
-          {pagination.totalPages > 1 && (
+          {updatedPagination.totalPages > 1 && (
             <div className="flex items-center justify-between mt-6 border-t pt-4">
               <div className="text-sm text-muted-foreground">
-                Showing {((pagination.currentPage - 1) * 10) + 1} to {Math.min(pagination.currentPage * 10, pagination.totalProducts)} of {pagination.totalProducts} products
+                Showing {((updatedPagination.currentPage - 1) * 10) + 1} to {Math.min(updatedPagination.currentPage * 10, updatedPagination.totalProducts)} of {updatedPagination.totalProducts} products
               </div>
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handlePageChange(pagination.currentPage - 1)}
-                  disabled={!pagination.hasPrev}
+                  onClick={() => setPagination(prev => ({ ...prev, currentPage: prev.currentPage - 1 }))}
+                  disabled={!updatedPagination.hasPrev}
                 >
                   <ChevronLeft className="h-4 w-4" />
                   Previous
                 </Button>
                 <span className="text-sm">
-                  Page {pagination.currentPage} of {pagination.totalPages}
+                  Page {updatedPagination.currentPage} of {updatedPagination.totalPages}
                 </span>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handlePageChange(pagination.currentPage + 1)}
-                  disabled={!pagination.hasNext}
+                  onClick={() => setPagination(prev => ({ ...prev, currentPage: prev.currentPage + 1 }))}
+                  disabled={!updatedPagination.hasNext}
                 >
                   Next
                   <ChevronRight className="h-4 w-4" />
