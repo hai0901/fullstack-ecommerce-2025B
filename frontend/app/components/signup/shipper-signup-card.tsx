@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { useAppDispatch } from "~/hooks/redux-hooks";
 import { loginUser } from "~/features/authentication/authenticationSlice";
 import { useNavigate } from "react-router";
+import { getTokenExpiry } from "~/utils/jwt";
 
 const shipperSignUpFormSchema = z.object({
   username: z
@@ -86,6 +87,7 @@ export default function ShipperSignUpCard() {
         username: data.user.username,
         name: data.user.name || data.user.businessName || data.user.username,
         token: data.token,
+        tokenExpiry: getTokenExpiry(data.token),
         role: role,
         profilePicture: data.user.profilePicture || null,
         address: data.user.address || null,

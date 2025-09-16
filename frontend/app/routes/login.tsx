@@ -17,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAppDispatch } from "~/hooks/redux-hooks";
 import { loginUser } from "~/features/authentication/authenticationSlice";
 import axios from "axios";
+import { getTokenExpiry } from "~/utils/jwt";
 
 const loginFormSchema = z.object({
   username: z.string().min(2, {
@@ -53,6 +54,7 @@ export default function LoginPage() {
         username: data.user.username,
         name: data.user.name || data.user.businessName || data.user.username,
         token: data.token,
+        tokenExpiry: getTokenExpiry(data.token),
         role: role,
         profilePicture: data.user.profilePicture || null,
         address: data.user.address || null,

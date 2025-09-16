@@ -43,7 +43,7 @@ exports.login = async (req, res) => {
     }
 
     const tokenPayload = { sub: user._id.toString(), username: user.username, role: user.role };
-    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '3h' });
 
     const rawProfilePicture = user.profilePicture || null;
     const isRelative = rawProfilePicture && rawProfilePicture.startsWith('/');

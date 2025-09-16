@@ -74,7 +74,7 @@ exports.register = async (req, res) => {
 
     // Generate JWT token
     const tokenPayload = { sub: user._id.toString(), username: user.username, role: user.role };
-    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '3h' });
 
     // Return login-style response with absolute profilePicture URL
     const rawProfilePicture = user.profilePicture || null;

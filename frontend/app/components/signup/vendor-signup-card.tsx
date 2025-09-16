@@ -15,6 +15,7 @@ import { isBusinessAddressTaken, isBusinessNameTaken, isUsernameTaken } from "~/
 import { useAppDispatch } from "~/hooks/redux-hooks";
 import { loginUser } from "~/features/authentication/authenticationSlice";
 import { useNavigate } from "react-router";
+import { getTokenExpiry } from "~/utils/jwt";
 
 const vendorSignUpFormSchema = z.object({
   username: z
@@ -87,6 +88,7 @@ export default function VendorSignUpCard() {
         username: data.user.username,
         name: data.user.name || data.user.businessName || data.user.username,
         token: data.token,
+        tokenExpiry: getTokenExpiry(data.token),
         role: role,
         profilePicture: data.user.profilePicture || null,
         address: data.user.address || null,
