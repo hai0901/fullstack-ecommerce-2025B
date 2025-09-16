@@ -2,7 +2,8 @@ import { useMemo, useState, useEffect } from "react";
 import { Link, Outlet, useSearchParams } from "react-router";
 import Footer from "~/components/footer";
 import NavBar from "~/components/nav-bar";
-import { columns, type Product } from "~/components/vendor/product-columns";
+import { createColumns, type Product, type ProductViewActions } from "~/components/vendor/product-columns";
+import ProductViewModal from "~/components/vendor/product-view-modal";
 import { DataTable } from "~/components/ui/data-table";
 import {
   DropdownMenu,
@@ -50,6 +51,8 @@ export default function VendorProducts() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchProducts = async (page = 1, search = "", cat = "") => {
     try {
@@ -180,6 +183,33 @@ export default function VendorProducts() {
     }
     setPagination(prev => ({ ...prev, currentPage: 1 }));
   };
+
+  const handleViewProduct = (product: Product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      // TODO: Implement delete API call
+      console.log('Delete product:', productId);
+      // After successful deletion, refresh the products
+      fetchProducts(1, "", "");
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProduct(null);
+  };
+
+  // Create columns with actions
+  const columns = createColumns({
+    onView: handleViewProduct,
+    onDelete: handleDeleteProduct
+  });
 
 
   if (loading) {
@@ -356,6 +386,14 @@ export default function VendorProducts() {
         </div>
       </div>
       <Outlet/>
+      
+      {/* Product View Modal */}
+      <ProductViewModal
+        product={selectedProduct}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onDelete={handleDeleteProduct}
+      />
     </main>
   </>
 }

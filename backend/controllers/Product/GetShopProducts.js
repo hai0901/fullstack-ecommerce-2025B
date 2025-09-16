@@ -1,28 +1,17 @@
 const Product = require('../../models/Product');
 const Category = require('../../models/Category');
 
-exports.getVendorProducts = async (req, res) => {
+exports.getShopProducts = async (req, res) => {
   try {
-    const { username } = req.params;
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 9;
     const search = req.query.search || '';
     const category = req.query.category || '';
-
-    if (!username) {
-      return res.status(400).json({ error: 'Username is required' });
-    }
-
-    // Find user by username to get the ObjectId
-    const User = require('../../models/User');
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
+    const minPrice = parseFloat(req.query.minPrice) || 0;
+    const maxPrice = parseFloat(req.query.maxPrice) || Infinity;
 
     // Build filter object
     const filter = {
-      vendorId: user._id,
       isDeleted: false
     };
 
@@ -54,6 +43,13 @@ exports.getVendorProducts = async (req, res) => {
       }
     }
 
+    // Add price range filter
+    if (minPrice > 0 || maxPrice < Infinity) {
+      filter.price = {};
+      if (minPrice > 0) filter.price.$gte = minPrice;
+      if (maxPrice < Infinity) filter.price.$lte = maxPrice;
+    }
+
     // Calculate skip value for pagination
     const skip = (page - 1) * limit;
 
@@ -63,12 +59,13 @@ exports.getVendorProducts = async (req, res) => {
     // Get products with pagination
     const products = await Product.find(filter)
       .populate('categoryId', 'name')
+      .populate('vendorId', 'username')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .lean();
 
-    // Transform products to include category name
+    // Transform products to include category name and vendor username
     const transformedProducts = products.map(product => {
       // Convert relative image path to absolute URL
       let imageUrl = product.image;
@@ -77,12 +74,13 @@ exports.getVendorProducts = async (req, res) => {
       }
       
       return {
-        id: product._id.toString(),
+        id: product._id,
         name: product.name,
-        category: product.categoryId.name,
         description: product.description,
         price: product.price,
         image: imageUrl,
+        category: product.categoryId?.name || 'Uncategorized',
+        vendor: product.vendorId?.username || 'Unknown',
         createdAt: product.createdAt,
         updatedAt: product.updatedAt
       };
@@ -103,7 +101,9 @@ exports.getVendorProducts = async (req, res) => {
         hasPrev
       }
     });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+
+  } catch (error) {
+    console.error('Error fetching shop products:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };

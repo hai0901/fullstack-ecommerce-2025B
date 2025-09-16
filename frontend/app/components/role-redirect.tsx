@@ -17,12 +17,12 @@ export default function RoleRedirect() {
       } else if (role === 'shipper') {
         navigate('/delivery', { replace: true });
       } else {
-        // Unknown role, redirect to shop as fallback
-        navigate('/shop', { replace: true });
+        // Unknown role, redirect to homepage as fallback
+        navigate('/homepage', { replace: true });
       }
     } else {
-      // User is not logged in, redirect to login
-      navigate('/login', { replace: true });
+      // User is not logged in, redirect to homepage
+      navigate('/homepage', { replace: true });
     }
   }, [user.isAuthenticated, user.role, navigate]);
 

@@ -5,7 +5,8 @@ import { Badge } from "~/components/ui/badge";
 import { useAppSelector } from "~/hooks/redux-hooks";
 import { useMemo, useState } from "react";
 import { Link, Outlet } from "react-router";
-import { columns, type Order } from "~/components/shipper/order-columns";
+import { createColumns, type Order, type OrderViewActions } from "~/components/shipper/order-columns";
+import OrderDetailModal from "~/components/shipper/order-detail-modal";
 import { DataTable } from "~/components/ui/data-table";
 import {
   DropdownMenu,
@@ -20,31 +21,53 @@ import { SlidersHorizontal } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 
-function getOrders(): Order[] {
+function getOrders(userDistributionHub: string): Order[] {
   const now = new Date()
+  const distributionHubs = ["Hub A", "Hub B", "Hub C", "Hub D"];
+  
   return Array.from({ length: 30 }, (_, index) => {
     const idNum = (index + 1).toString().padStart(3, '0')
     const createdAt = new Date(now)
     createdAt.setDate(now.getDate() - (30 - index))
     const updatedAt = new Date(createdAt.getTime() + 1000 * 60 * 60 * 24)
+    const randomHub = distributionHubs[Math.floor(Math.random() * distributionHubs.length)];
+    
     return {
       id: `O-${idNum}`,
       totalPrice: Math.round((Math.random() * (5000000 - 50000) + 50000) / 1000) * 1000,
-      products: [],
+      products: [
+        {
+          id: `P-${index + 1}`,
+          name: `Product ${index + 1}`,
+          category: "Electronics",
+          description: `Description for product ${index + 1}`,
+          price: Math.round((Math.random() * (1000000 - 100000) + 100000) / 1000) * 1000,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          image: "https://via.placeholder.com/150"
+        }
+      ],
       description: `Mock description for order ${index + 1}`,
       customerName: `Customer ${index + 1}`,
       address: `123 Mock St, City ${index + 1}`,
       createdAt,
       updatedAt,
       status: ['active', 'delivered', 'cancelled'][index % 3] as 'active' | 'delivered' | 'cancelled',
+      distributionHub: randomHub,
     }
-  })
+  }).filter(order => 
+    order.distributionHub === userDistributionHub && 
+    order.status === 'active'
+  )
 }
 
 export default function DeliveryPage() {
   const user = useAppSelector(state => state.auth);
-  const orders = getOrders();
+  const userDistributionHub = user.distributionHub || "Hub A"; // Default to Hub A if not set
+  const orders = getOrders(userDistributionHub);
   const [query, setQuery] = useState("");
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return orders;
@@ -54,6 +77,36 @@ export default function DeliveryPage() {
         .some((v) => String(v).toLowerCase().includes(q))
     );
   }, [orders, query]);
+
+  const handleViewOrder = (order: Order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
+
+  const handleUpdateStatus = async (orderId: string, status: 'delivered' | 'cancelled') => {
+    try {
+      // TODO: Implement API call to update order status
+      console.log(`Updating order ${orderId} to ${status}`);
+      
+      // For now, just show a success message
+      // In a real app, you would call the API and refresh the orders
+      alert(`Order ${orderId} has been marked as ${status}`);
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      alert('Failed to update order status');
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedOrder(null);
+  };
+
+  // Create columns with actions
+  const columns = createColumns({
+    onView: handleViewOrder,
+    onUpdateStatus: handleUpdateStatus
+  });
 
   return <>
     <main>
@@ -110,6 +163,14 @@ export default function DeliveryPage() {
         />
       </div>
       <Outlet />
+      
+      {/* Order Detail Modal */}
+      <OrderDetailModal
+        order={selectedOrder}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onUpdateStatus={handleUpdateStatus}
+      />
     </main>
   </>
 }

@@ -7,6 +7,9 @@ import {
 
 export default [
   route("/", "components/role-redirect.tsx"),
+  layout("routes/layout/public-layout.tsx", [
+    route("/homepage", "routes/customer/buyer-index.tsx"),
+  ]),
   layout("routes/layout/buyer-main-layout.tsx", [
     route("/shop", "routes/customer/shop.tsx", [
       route(":productID", "routes/customer/product.tsx")

@@ -21,6 +21,7 @@ import axios from "axios";
 
 export default function NavBar() {
   const user = useAppSelector(state => state.auth);
+  const cart = useAppSelector(state => state.cart);
   const dispatch = useAppDispatch();
 
   return (
@@ -34,13 +35,17 @@ export default function NavBar() {
             height="20"
           />
         </Link>
-        {user.role == "Customer" &&
+        {user.role?.toLowerCase() === "customer" &&
           <div className="flex flex-row w-full gap-3 pl-24 justify-center">
             <NavBarSearch />
             <Link to="/cart">
-              <Button variant="ghost" className="cursor-pointer">
+              <Button variant="ghost" className="cursor-pointer relative">
                 <ShoppingCart size={32} />
-                <Badge className="h-5 min-w-5 rounded-full p-0.5 font-mono tabular-nums">99</Badge>
+                {cart.items.length > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 min-w-5 rounded-full p-0.5 font-mono tabular-nums">
+                    {cart.items.reduce((total, item) => total + item.quantity, 0)}
+                  </Badge>
+                )}
               </Button>
             </Link>
           </div>
@@ -78,7 +83,7 @@ export default function NavBar() {
                             } catch {}
                             dispatch(logout());
                           }}
-                          to="/">
+                          to="/login">
                           <LogOut />
                           Log Out
                         </Link>

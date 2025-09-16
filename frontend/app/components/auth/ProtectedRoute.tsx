@@ -11,14 +11,14 @@ interface ProtectedRouteProps {
 export default function ProtectedRoute({ 
   children, 
   requiredRole, 
-  redirectTo = "/login" 
+  redirectTo = "/homepage" 
 }: ProtectedRouteProps) {
   const user = useAppSelector(state => state.auth);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    // If user is not authenticated, redirect to login
+    // If user is not authenticated, redirect to homepage
     if (!user.isAuthenticated) {
       navigate(redirectTo, { 
         replace: true, 
@@ -46,7 +46,7 @@ export default function ProtectedRoute({
       } else if (userRole === 'shipper') {
         navigate('/delivery', { replace: true });
       } else {
-        navigate('/', { replace: true });
+        navigate('/homepage', { replace: true });
       }
       return;
     }

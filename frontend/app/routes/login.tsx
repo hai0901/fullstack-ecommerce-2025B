@@ -70,7 +70,7 @@ export default function LoginPage() {
         if (role === 'customer') navigate('/shop');
         else if (role === 'vendor') navigate('/my-products');
         else if (role === 'shipper') navigate('/delivery');
-        else navigate('/');
+        else navigate('/homepage');
       }
     } catch (err) {
       form.setError("root", {

@@ -20,10 +20,16 @@ export type Order = {
   address: string,
   createdAt: Date,
   updatedAt: Date,
-  status: 'active' | 'delivered' | 'cancelled'
+  status: 'active' | 'delivered' | 'cancelled',
+  distributionHub?: string
 }
 
-export const columns: ColumnDef<Order>[] = [
+export interface OrderViewActions {
+  onView: (order: Order) => void;
+  onUpdateStatus: (orderId: string, status: 'delivered' | 'cancelled') => void;
+}
+
+export const createColumns = (actions: OrderViewActions): ColumnDef<Order>[] => [
   {
     accessorKey: "id",
     meta: { label: "ID" },
@@ -188,17 +194,22 @@ export const columns: ColumnDef<Order>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => console.log('view', order.id)}>
-              <Link to={order.id}>
-               View Details
-              </Link>
+            <DropdownMenuItem onClick={() => actions.onView(order)}>
+              View Details
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => console.log('deliver', order.id)}>
-              Deliver
-            </DropdownMenuItem>
-            <DropdownMenuItem variant="destructive" onClick={() => console.log('delete', order.id)}>
-              Cancel
-            </DropdownMenuItem>
+            {order.status === 'active' && (
+              <>
+                <DropdownMenuItem onClick={() => actions.onUpdateStatus(order.id, 'delivered')}>
+                  Mark as Delivered
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  variant="destructive" 
+                  onClick={() => actions.onUpdateStatus(order.id, 'cancelled')}
+                >
+                  Cancel Order
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       )

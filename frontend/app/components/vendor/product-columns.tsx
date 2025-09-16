@@ -19,7 +19,12 @@ export type Product = {
   image: string
 }
 
-export const columns: ColumnDef<Product>[] = [
+export interface ProductViewActions {
+  onView: (product: Product) => void;
+  onDelete: (productId: string) => void;
+}
+
+export const createColumns = (actions: ProductViewActions): ColumnDef<Product>[] => [
   {
     accessorKey: "id",
     meta: { label: "ID" },
@@ -122,13 +127,10 @@ export const columns: ColumnDef<Product>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => console.log('view', product.id)}>
+            <DropdownMenuItem onClick={() => actions.onView(product)}>
               View product
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => console.log('edit', product.id)}>
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem variant="destructive" onClick={() => console.log('delete', product.id)}>
+            <DropdownMenuItem variant="destructive" onClick={() => actions.onDelete(product.id)}>
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
