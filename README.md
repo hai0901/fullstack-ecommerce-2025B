@@ -6,7 +6,7 @@ A modern, full-stack e-commerce platform built with React, Node.js, and MongoDB.
 
 ### Frontend (React + TypeScript)
 - **Framework**: React with React Router for navigation
-- **UI Library**: Radix UI components with custom styling
+- **UI Library**: Radix UI, shadcn components with custom styling
 - **State Management**: Redux Toolkit for global state
 - **Styling**: Tailwind CSS for responsive design
 - **Build Tool**: Vite for fast development and building
@@ -26,7 +26,6 @@ A modern, full-stack e-commerce platform built with React, Node.js, and MongoDB.
 - **User Profiles**: Role-specific profile management
 - **Image Handling**: Profile pictures and product images with cloud storage
 - **Search & Filtering**: Advanced product search with category and price filters
-- **Responsive Design**: Mobile-first approach with modern UI/UX
 
 ## 🚀 Quick Start
 
