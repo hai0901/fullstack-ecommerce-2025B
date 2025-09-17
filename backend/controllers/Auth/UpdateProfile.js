@@ -262,3 +262,84 @@ exports.updateProfilePicture = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+exports.updateName = async (req, res) => {
+  try {
+    const { name, businessName } = req.body;
+    const user = req.user; // From auth middleware
+
+    console.log('Updating name for user:', user.username, 'Role:', user.role);
+
+    // Update based on user role
+    if (user.role === 'customer') {
+      const customerProfile = await CustomerProfile.findOne({ username: user.username });
+      if (!customerProfile) {
+        return res.status(404).json({ error: 'Customer profile not found' });
+      }
+
+      await CustomerProfile.findOneAndUpdate(
+        { username: user.username },
+        { name: name },
+        { new: true }
+      );
+
+      console.log('Updated customer name:', name);
+    } else if (user.role === 'vendor') {
+      const vendorProfile = await VendorProfile.findOne({ username: user.username });
+      if (!vendorProfile) {
+        return res.status(404).json({ error: 'Vendor profile not found' });
+      }
+
+      await VendorProfile.findOneAndUpdate(
+        { username: user.username },
+        { businessName: businessName },
+        { new: true }
+      );
+
+      console.log('Updated vendor business name:', businessName);
+    } else if (user.role === 'shipper') {
+      const shipperProfile = await ShipperProfile.findOne({ username: user.username });
+      if (!shipperProfile) {
+        return res.status(404).json({ error: 'Shipper profile not found' });
+      }
+
+      await ShipperProfile.findOneAndUpdate(
+        { username: user.username },
+        { name: name },
+        { new: true }
+      );
+
+      console.log('Updated shipper name:', name);
+    } else {
+      return res.status(400).json({ error: 'Invalid user role' });
+    }
+
+    // Return updated user information
+    const updatedUser = await User.findById(user._id).select('-passwordHash');
+    res.json({ 
+      message: 'Name updated successfully',
+      user: {
+        username: updatedUser.username,
+        name: user.role === 'customer' || user.role === 'shipper' ? 
+          (await CustomerProfile.findOne({ username: user.username }))?.name ||
+          (await ShipperProfile.findOne({ username: user.username }))?.name :
+          user.role === 'vendor' ? 
+          (await VendorProfile.findOne({ username: user.username }))?.businessName :
+          null,
+        address: user.role === 'customer' ? 
+          (await CustomerProfile.findOne({ username: user.username }))?.address :
+          user.role === 'vendor' ? 
+          (await VendorProfile.findOne({ username: user.username }))?.businessAddress :
+          null,
+        distributionHub: user.role === 'shipper' ? 
+          (await ShipperProfile.findOne({ username: user.username }))?.distributionHub :
+          null,
+        profilePicture: updatedUser.profilePicture,
+        role: updatedUser.role
+      }
+    });
+  } catch (err) {
+    console.error('Error updating name:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}

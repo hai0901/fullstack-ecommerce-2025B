@@ -4,9 +4,15 @@ import type { User } from "~/features/authentication/authenticationSlice";
 import type { AppDispatch } from "~/store";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "../ui/form";
-import { customerFormSchema } from "~/lib/schemas";
+import { z } from "zod";
+
+// Create a simple schema just for name editing
+const nameFormSchema = z.object({
+  name: z
+    .string({message: "Please enter your name."})
+    .min(5, {message: "Name must be at least 5 characters"}),
+});
 import { useForm } from "react-hook-form";
-import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import api from "~/utils/api";
 import { toast } from "sonner";
@@ -15,27 +21,29 @@ import { useState } from "react";
 export default function EditNameCard({ user, dispatch }: { user: User, dispatch: AppDispatch }) {
   const [isLoading, setIsLoading] = useState(false);
   
-  const customerForm = useForm<z.infer<typeof customerFormSchema>>({
-    resolver: zodResolver(customerFormSchema),
+  const nameForm = useForm<z.infer<typeof nameFormSchema>>({
+    resolver: zodResolver(nameFormSchema),
     mode: "onChange",
     defaultValues: {
       name: user.name as string
     }
   });
   
-  const onSubmit = async (values: z.infer<typeof customerFormSchema>) => {
+  const onSubmit = async (values: z.infer<typeof nameFormSchema>) => {
+    console.log("submitting...");
     try {
       setIsLoading(true);
-      
+  
       // Prepare update data based on user role
       const updateData: any = {};
-      if (user.role === 'customer') {
+      if (user.role === 'customer' || user.role === 'shipper') {
         updateData.name = values.name;
       } else if (user.role === 'vendor') {
         updateData.businessName = values.name;
       }
       
-      const response = await api.put('/auth/profile', updateData);
+      const response = await api.put('/auth/name', updateData);
+      console.log('response: ', response);
       
       // Update Redux state with backend response
       dispatch({
@@ -52,7 +60,7 @@ export default function EditNameCard({ user, dispatch }: { user: User, dispatch:
     }
   };
   
-  const invalidForm = customerForm.watch("name") === user.name || customerForm.getFieldState("name", customerForm.formState).invalid;
+  const invalidForm = nameForm.watch("name") === user.name || nameForm.getFieldState("name", nameForm.formState).invalid;
 
   return (
     <div className="flex p-6 pb-10 gap-6">
@@ -61,10 +69,10 @@ export default function EditNameCard({ user, dispatch }: { user: User, dispatch:
         <div className="flex flex-col gap-3 font-light text-sm text-muted-foreground">
           <p className="font-light">Please enter your full name, or a display name you are comfortable with.</p>
           <div className="flex gap-3 w-full">
-            <Form {...customerForm}>
-              <form onSubmit={customerForm.handleSubmit(onSubmit)}>
+            <Form {...nameForm}>
+              <form onSubmit={nameForm.handleSubmit(onSubmit)} className="flex gap-3 w-full">
                 <FormField 
-                  control={customerForm.control}
+                  control={nameForm.control}
                   name="name"
                   render={({ field }) => (
                     <Popover>
@@ -88,7 +96,7 @@ export default function EditNameCard({ user, dispatch }: { user: User, dispatch:
                     </Popover>
                   )}
                 />
-                <Button disabled={invalidForm || isLoading} type="submit" variant="outline">
+                <Button type="submit" variant="outline" disabled={invalidForm || isLoading}>
                   {isLoading ? 'Saving...' : 'Save'}
                 </Button>
               </form>
