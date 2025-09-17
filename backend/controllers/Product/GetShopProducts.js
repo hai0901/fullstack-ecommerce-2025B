@@ -16,6 +16,7 @@ exports.getShopProducts = async (req, res) => {
     const limit = parseInt(req.query.limit) || 9;
     const search = req.query.search || '';
     const category = req.query.category || '';
+    const categories = req.query.categories || ''; // Support multiple categories
     const minPrice = parseFloat(req.query.minPrice) || 0;
     const maxPrice = parseFloat(req.query.maxPrice) || 1000000;
 
@@ -34,7 +35,7 @@ exports.getShopProducts = async (req, res) => {
     }
 
     // Log filter parameters for debugging
-    console.log('Filter parameters:', { search, category, minPrice, maxPrice, page, limit });
+    console.log('Filter parameters:', { search, category, categories, minPrice, maxPrice, page, limit });
 
     // Build filter object - all conditions must be met (AND logic)
     const filter = {
@@ -49,17 +50,19 @@ exports.getShopProducts = async (req, res) => {
       ];
     }
 
-    // Add category filter (exact match)
+    // Add category filter (support both single category and multiple categories)
+    let categoryIds = [];
+    
+    // Handle single category (backward compatibility)
     if (category && category.trim()) {
       const categoryDoc = await Category.findOne({ 
         name: { $regex: new RegExp(`^${category.trim()}$`, 'i') }, 
         isDeleted: false 
       });
       if (categoryDoc) {
-        filter.categoryId = categoryDoc._id;
+        categoryIds.push(categoryDoc._id);
       } else {
-        // If category doesn't exist, return empty results
-        console.log('Category not found:', category);
+        console.log('Single category not found:', category);
         return res.json({
           products: [],
           pagination: {
@@ -70,6 +73,53 @@ exports.getShopProducts = async (req, res) => {
             hasPrev: false
           }
         });
+      }
+    }
+    
+    // Handle multiple categories (comma-separated or array)
+    if (categories && categories.trim()) {
+      let categoryNames = [];
+      
+      // Check if categories is a string (comma-separated) or array
+      if (typeof categories === 'string') {
+        categoryNames = categories.split(',').map(cat => cat.trim()).filter(cat => cat);
+      } else if (Array.isArray(categories)) {
+        categoryNames = categories.map(cat => cat.trim()).filter(cat => cat);
+      }
+      
+      if (categoryNames.length > 0) {
+        const categoryDocs = await Category.find({ 
+          name: { $in: categoryNames.map(name => new RegExp(`^${name}$`, 'i')) }, 
+          isDeleted: false 
+        });
+        
+        if (categoryDocs.length > 0) {
+          categoryIds = [...categoryIds, ...categoryDocs.map(doc => doc._id)];
+        } else {
+          console.log('Multiple categories not found:', categoryNames);
+          return res.json({
+            products: [],
+            pagination: {
+              currentPage: page,
+              totalPages: 0,
+              totalProducts: 0,
+              hasNext: false,
+              hasPrev: false
+            }
+          });
+        }
+      }
+    }
+    
+    // Apply category filter if we have any category IDs
+    if (categoryIds.length > 0) {
+      // Remove duplicates
+      categoryIds = [...new Set(categoryIds)];
+      
+      if (categoryIds.length === 1) {
+        filter.categoryId = categoryIds[0];
+      } else {
+        filter.categoryId = { $in: categoryIds };
       }
     }
 
@@ -141,6 +191,7 @@ exports.getShopProducts = async (req, res) => {
       filters: {
         search: search || null,
         category: category || null,
+        categories: categories || null,
         minPrice: minPrice > 0 ? minPrice : null,
         maxPrice: maxPrice < 1000000 ? maxPrice : null
       }

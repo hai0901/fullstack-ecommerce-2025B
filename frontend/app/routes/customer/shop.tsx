@@ -79,7 +79,11 @@ export default function Shop() {
       }
 
       // Add filter parameters
-      if (filters.category) {
+      if (filters.categories && filters.categories.length > 0) {
+        // Send multiple categories as comma-separated string
+        params.append('categories', filters.categories.join(','));
+      } else if (filters.category) {
+        // Backward compatibility for single category
         params.append('category', filters.category);
       }
       if (filters.minPrice) {
@@ -167,6 +171,7 @@ export default function Shop() {
   // Apply filters function
   const handleApplyFilters = () => {
     const filters: any = {};
+    const selectedCategories: string[] = [];
     
     // Process filter items from Redux state
     filterItems.forEach(item => {
@@ -181,16 +186,21 @@ export default function Shop() {
         }
       } else {
         // All other items are categories (they use category._id as id)
-        // For now, we'll take the first category if multiple are selected
-        // TODO: Support multiple categories if needed
-        if (!filters.category) {
-          filters.category = item.description;
+        // Collect all selected categories
+        if (typeof item.description === 'string') {
+          selectedCategories.push(item.description);
         }
       }
     });
     
+    // Set categories filter
+    if (selectedCategories.length > 0) {
+      filters.categories = selectedCategories;
+    }
+    
     console.log('Applying filters:', filters);
     console.log('Filter items from Redux:', filterItems);
+    console.log('Selected categories:', selectedCategories);
     
     setAppliedFilters(filters);
     fetchProducts(1, true, filters);

@@ -83,9 +83,24 @@ export default function Category() {
     );
   }
 
+  // Count selected categories
+  const selectedCategoryCount = filterItems.filter(item => item.id !== 'priceRange').length;
+
   return (
     <div className="flex flex-col p-6 pr-7 gap-6">
-      <Label className="font-normal">Category</Label>
+      <div className="flex items-center justify-between">
+        <Label className="font-normal">Category</Label>
+        {selectedCategoryCount > 0 && (
+          <span className="text-xs text-muted-foreground">
+            {selectedCategoryCount} selected
+          </span>
+        )}
+      </div>
+      {selectedCategoryCount > 1 && (
+        <p className="text-xs text-muted-foreground">
+          Products from any selected category will be shown
+        </p>
+      )}
       <Collapsible
         open={categoryExpanded}
         onOpenChange={setCategoryExpanded}
