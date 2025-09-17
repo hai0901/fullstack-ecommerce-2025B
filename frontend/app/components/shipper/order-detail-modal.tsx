@@ -162,6 +162,7 @@ export default function OrderDetailModal({
                 <TableHeader>
                   <TableRow>
                     <TableHead>Product</TableHead>
+                    <TableHead>Quantity</TableHead>
                     <TableHead>Price</TableHead>
                     <TableHead>Description</TableHead>
                   </TableRow>
@@ -181,6 +182,9 @@ export default function OrderDetailModal({
                             <div className="text-xs text-muted-foreground">ID: {product.id}</div>
                           </div>
                         </div>
+                      </TableCell>
+                      <TableCell className="text-sm font-medium">
+                        {product.quantity || 1}
                       </TableCell>
                       <TableCell className="text-sm">{product.price.toLocaleString()} VND</TableCell>
                       <TableCell className="max-w-xs truncate text-sm">{product.description}</TableCell>

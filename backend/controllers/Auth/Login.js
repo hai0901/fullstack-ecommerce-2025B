@@ -42,12 +42,19 @@ exports.login = async (req, res) => {
     } else if (user.role === 'vendor') {
       const profile = await VendorProfile.findOne({ username: user.username });
       if (profile) {
-        profileData = { businessName: profile.businessName, businessAddress: profile.businessAddress };
+        profileData = { 
+          name: profile.businessName, 
+          address: profile.businessAddress 
+        };
       }
     } else if (user.role === 'shipper') {
       const profile = await ShipperProfile.findOne({ username: user.username });
       if (profile) {
-        profileData = { distributionHub: profile.distributionHub };
+        profileData = { 
+          name: user.username, // Shippers don't have a separate name field
+          address: null, // Shippers don't have address, only distributionHub
+          distributionHub: profile.distributionHub 
+        };
       }
     }
 

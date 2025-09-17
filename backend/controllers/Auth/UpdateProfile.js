@@ -86,7 +86,7 @@ exports.updateProfile = async (req, res) => {
           (await CustomerProfile.findOne({ username: user.username }))?.name :
           user.role === 'vendor' ? 
           (await VendorProfile.findOne({ username: user.username }))?.businessName :
-          null,
+          user.role === 'shipper' ? user.username : null,
         address: user.role === 'customer' ? 
           (await CustomerProfile.findOne({ username: user.username }))?.address :
           user.role === 'vendor' ? 
@@ -152,7 +152,7 @@ exports.updateUsername = async (req, res) => {
           (await CustomerProfile.findOne({ username: newUsername }))?.name :
           user.role === 'vendor' ? 
           (await VendorProfile.findOne({ username: newUsername }))?.businessName :
-          null,
+          user.role === 'shipper' ? newUsername : null,
         address: user.role === 'customer' ? 
           (await CustomerProfile.findOne({ username: newUsername }))?.address :
           user.role === 'vendor' ? 
@@ -250,7 +250,7 @@ exports.updateProfilePicture = async (req, res) => {
             (await CustomerProfile.findOne({ username: user.username }))?.name :
             user.role === 'vendor' ? 
             (await VendorProfile.findOne({ username: user.username }))?.businessName :
-            null,
+            user.role === 'shipper' ? user.username : null,
           address: user.role === 'customer' ? 
             (await CustomerProfile.findOne({ username: user.username }))?.address :
             user.role === 'vendor' ? 
@@ -329,12 +329,11 @@ exports.updateName = async (req, res) => {
       message: 'Name updated successfully',
       user: {
         username: updatedUser.username,
-        name: user.role === 'customer' || user.role === 'shipper' ? 
-          (await CustomerProfile.findOne({ username: user.username }))?.name ||
-          (await ShipperProfile.findOne({ username: user.username }))?.name :
+        name: user.role === 'customer' ? 
+          (await CustomerProfile.findOne({ username: user.username }))?.name :
           user.role === 'vendor' ? 
           (await VendorProfile.findOne({ username: user.username }))?.businessName :
-          null,
+          user.role === 'shipper' ? user.username : null,
         address: user.role === 'customer' ? 
           (await CustomerProfile.findOne({ username: user.username }))?.address :
           user.role === 'vendor' ? 

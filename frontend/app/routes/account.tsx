@@ -44,7 +44,11 @@ export default function AccountPage() {
                 <h3>{user.name}</h3>
                 <Badge variant="secondary" className="rounded-full text-xs -ml-2">{user.role}</Badge>
                 <h3 className="text-xs text-muted-foreground">{user.username}</h3>
-                <h3 className="text-xs text-muted-foreground">{user.address}</h3>
+                {user.role !== "shipper" &&
+                <h3 className="text-xs text-muted-foreground">
+                  {user.address || 'No address set'}
+                </h3>
+                }
               </div>
             </div>
             
@@ -54,7 +58,7 @@ export default function AccountPage() {
           <EditAvatarCard user={user} dispatch={dispatch} />
           <EditNameCard user={user} dispatch={dispatch} />
           <EditUsermameCard user={user} dispatch={dispatch} />
-          <EditAddressCard user={user} dispatch={dispatch} />
+          {user.role !== "shipper" && <EditAddressCard user={user} dispatch={dispatch} />}
           <EditPassword user={user} dispatch={dispatch} />
           <div className="flex p-6 pb-10 gap-6">
             <div className="flex flex-col gap-6">

@@ -49,6 +49,7 @@ function transformOrder(backendOrder: any): Order {
       category: "Category", // You might want to add category to the backend response
       description: product.productId.name, // Using name as description for now
       price: product.price,
+      quantity: product.quantity,
       createdAt: new Date(),
       updatedAt: new Date(),
       image: product.productId.image

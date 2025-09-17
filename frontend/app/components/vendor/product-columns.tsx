@@ -23,6 +23,7 @@ export type Product = {
   category: string
   description: string
   price: number
+  quantity?: number
   createdAt: Date | string,
   updatedAt: Date | string,
   image: string
