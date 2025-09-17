@@ -1,0 +1,63 @@
+/*
+ * RMIT University Vietnam
+ * Course: COSC2769 - Full Stack Development
+ * Semester: 2025B
+ * Assessment: Assignment 02
+ * Author: Le Duc Trung, Nguyen Huy Anh
+ * ID: s3979718, s3956092
+ */
+
+import { Dices } from "lucide-react";
+import { Button } from "~/components/ui/button";
+import { Label } from "~/components/ui/label";
+import { Separator } from "~/components/ui/separator";
+import { Switch } from "~/components/ui/switch";
+import PriceRange from "./price-range";
+import Category from "./category";
+import Filter from "./filter";
+
+interface FilterAreaProps {
+  onApplyFilters: () => void;
+}
+
+export default function FilterArea({ onApplyFilters }: FilterAreaProps) {
+  return (
+    <aside className="flex flex-col w-full lg:w-[418.5px] border-b lg:border-b-0 lg:border-l h-auto text-muted-foreground">
+      <Filter />
+      <Separator />
+
+      <PriceRange />
+      <Separator />
+
+      <Category />
+      <Separator />
+
+      {/* Apply Filters Button */}
+      <div className="p-6">
+        <Button 
+          onClick={onApplyFilters}
+          className="w-full"
+          size="lg"
+        >
+          Apply Filters
+        </Button>
+      </div>
+
+      {/* <div className="p-6 pr-7">
+        <div className="flex flex-row justify-between">
+          <Label className="font-normal">Surprise Me</Label>
+          <Button variant="outline" size="icon">
+            <Dices size={32} strokeWidth={1.75} />
+          </Button>
+        </div>
+        <p className="text-xs font-light mt-3">Let our random curations make your shopping unexpectedly delightful.</p>
+      </div>
+      <Separator />
+      <div className="flex justify-between p-6">
+        <Label className="font-normal">B&W Mode</Label>
+        <Switch id="bnw-mode" />
+      </div>
+      <Separator /> */}
+    </aside>
+  )
+}

@@ -1,0 +1,24 @@
+# Node modules
+node_modules/
+
+# Env variables (secrets, database credentials)
+.env
+
+# Log files
+logs/
+*.log
+npm-debug.log*
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# IDE/project files
+.vscode/
+.idea/
+
+# Compiled or temp files
+dist/
+build/
+.cache/
+tmp/
