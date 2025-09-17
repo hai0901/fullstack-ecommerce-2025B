@@ -10,6 +10,14 @@
 const express = require('express');
 const router = express.Router();
 
+const requireAuth = require('../middleware/auth');
+
+const { validateProductCreate, validateProductUpdate, validateIdParam, validatePriceQuery, sendIfInvalid } = require('../middleware/validators');
+
+const upload = require('../middleware/uploadImage');
+
+const requireRole = require('../middleware/requireRole');
+
 const { createProduct } = require('../controllers/Product/Create');
 const { updateProduct } = require('../controllers/Product/Update');
 const { deleteProduct } = require('../controllers/Product/Delete');
@@ -17,12 +25,12 @@ const { getProduct, getAllProducts } = require('../controllers/Product/View');
 const { getVendorProducts } = require('../controllers/Product/GetVendorProducts');
 const { getShopProducts } = require('../controllers/Product/GetShopProducts');
 
-router.post('/', createProduct);
-router.get('/', getAllProducts);
+router.post('/', requireAuth, requireRole('vendor'), upload.single('image'), validateProductCreate, sendIfInvalid, createProduct);
+router.get('/', validatePriceQuery, sendIfInvalid, getAllProducts);
 router.get('/shop', getShopProducts);
 router.get('/vendor/:username', getVendorProducts);
-router.get('/:id', getProduct);
-router.put('/:id', updateProduct);
-router.delete('/:id', deleteProduct);
+router.get('/:id', validateIdParam, sendIfInvalid, getProduct);
+router.put('/:id', requireAuth, requireRole('vendor'), validateIdParam, upload.single('image'), validateProductUpdate, sendIfInvalid, updateProduct);
+router.delete('/:id', requireAuth, requireRole('vendor'), validateIdParam, sendIfInvalid, deleteProduct);
 
 module.exports = router;
