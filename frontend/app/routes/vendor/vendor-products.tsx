@@ -28,6 +28,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { useAppSelector } from "~/hooks/redux-hooks";
 import axios from "axios";
+import api from "~/utils/api";
 
 interface Category {
   _id: string;
@@ -200,12 +201,20 @@ export default function VendorProducts() {
 
   const handleDeleteProduct = async (productId: string) => {
     try {
-      // TODO: Implement delete API call
-      console.log('Delete product:', productId);
+      // Call the backend delete API
+      await api.delete(`/products/${productId}`);
+      
       // After successful deletion, refresh the products
       fetchProducts(1, "", "");
+      
+      // Close modal if it's open
+      if (isModalOpen) {
+        setIsModalOpen(false);
+        setSelectedProduct(null);
+      }
     } catch (error) {
       console.error('Error deleting product:', error);
+      setError('Failed to delete product. Please try again.');
     }
   };
 
