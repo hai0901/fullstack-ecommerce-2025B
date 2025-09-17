@@ -1,3 +1,12 @@
+/*
+ * RMIT University Vietnam
+ * Course: COSC2769 - Full Stack Development
+ * Semester: 2025B
+ * Assessment: Assignment 02
+ * Author: Le Duc Trung, Nguyen Huy Anh
+ * ID: s3979718, s3956092
+ */
+
 export default function HeroGraphics({ className }: { className?: string }) {
   return (
   <svg className={`absolute ${className}`} width="1000" height="500" viewBox="0 0 1000 500" fill="none" xmlns="http://www.w3.org/2000/svg">

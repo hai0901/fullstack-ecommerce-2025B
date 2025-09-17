@@ -1,3 +1,12 @@
+/*
+ * RMIT University Vietnam
+ * Course: COSC2769 - Full Stack Development
+ * Semester: 2025B
+ * Assessment: Assignment 02
+ * Author: Le Duc Trung, Nguyen Huy Anh
+ * ID: s3979718, s3956092
+ */
+
 import { ScrollArea, ScrollBar } from "~/components/ui/scroll-area";
 import ShopProductCard from "~/components/customer/shop-product-card";
 import ShopProductSkeleton from "~/components/customer/shop-product-skeleton";

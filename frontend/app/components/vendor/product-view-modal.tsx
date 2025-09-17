@@ -1,3 +1,12 @@
+/*
+ * RMIT University Vietnam
+ * Course: COSC2769 - Full Stack Development
+ * Semester: 2025B
+ * Assessment: Assignment 02
+ * Author: Le Duc Trung, Nguyen Huy Anh
+ * ID: s3979718, s3956092
+ */
+
 import {
   Dialog,
   DialogContent,
@@ -8,7 +17,7 @@ import {
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { Product } from "./product-columns";
+import { type Product } from "./product-columns";
 
 interface ProductViewModalProps {
   product: Product | null;
