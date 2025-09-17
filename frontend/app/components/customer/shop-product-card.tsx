@@ -31,7 +31,7 @@ export default function ShopProductCard({ product }: ShopProductCardProps) {
         <img 
           alt={product.name} 
           src={product.image}
-          className="cursor-pointer w-full h-48 object-cover"
+          className="cursor-pointer w-full h-80 object-cover"
         />
       </Link>
       <div className="p-3">

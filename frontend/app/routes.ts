@@ -18,6 +18,10 @@ export default [
   route("/", "components/role-redirect.tsx"),
   layout("routes/layout/public-layout.tsx", [
     route("/homepage", "routes/customer/buyer-index.tsx"),
+    route("/about", "routes/about.tsx"),
+    route("/copyright", "routes/copyright.tsx"),
+    route("/privacy", "routes/privacy.tsx"),
+    route("/help", "routes/help.tsx"),
   ]),
   layout("routes/layout/buyer-main-layout.tsx", [
     route("/shop", "routes/customer/shop.tsx", [
