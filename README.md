@@ -241,6 +241,8 @@ This project is part of RMIT University Vietnam's Full Stack Development course 
 
 - Le Duc Trung (s3979718)
 - Nguyen Huy Anh (s3956092)
+- Nguyen Pham Tien Hai (s3979239)
+- Nguyen Thach Khanh Dzi (s3980883)
 
 ---
 
