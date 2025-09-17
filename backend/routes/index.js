@@ -20,5 +20,6 @@ router.use('/carts', require('./Cart'));
 router.use('/chatlogs', require('./ChatLog'));
 router.use('/distributionhubs', require('./DistributionHub'));
 router.use('/admins', require('./Admin'));
+router.use('/chat-ai', require('./ChatAI'));
 
 module.exports = router;

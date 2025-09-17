@@ -2,8 +2,8 @@
 // Course: COSC2769 - Full Stack Development
 // Semester: 2025B
 // Assessment: Assignment 02
-// Author: <Your Name>
-// ID: <Your ID>
+// Author: Nguyen Pham Tien Hai, Nguyen Thach Khanh Dzi
+// ID: s3979239, s3980883
 
 const { body, param, query, validationResult } = require('express-validator');
 

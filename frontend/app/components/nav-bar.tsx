@@ -25,6 +25,7 @@ import { cn } from "~/lib/utils";
 import { useAppDispatch, useAppSelector } from "~/hooks/redux-hooks";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { logout } from "~/features/authentication/authenticationSlice"; 
+import ChatWidget from '~/components/chat-widget';
 import axios from "axios";
 
 export default function NavBar() {
@@ -59,6 +60,14 @@ export default function NavBar() {
                   </Button>
                 </Link>
               )}
+              {user.role?.toLowerCase() === "admin" && (
+                <Link to="/admin">
+                  <Button variant="ghost" className="cursor-pointer">
+                    Admin
+                  </Button>
+                </Link>
+              )}
+
               <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
@@ -123,6 +132,7 @@ export default function NavBar() {
             </>
           }
         </div>
+        <ChatWidget />
       </header>
     </div>
   );
