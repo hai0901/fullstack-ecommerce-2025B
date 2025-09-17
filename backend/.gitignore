@@ -1,6 +1,9 @@
 # Node modules
 node_modules/
 
+# Env variables (secrets, database credentials)
+.env
+
 # Log files
 logs/
 *.log
