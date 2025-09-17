@@ -27,7 +27,6 @@ export default function Hero() {
           <Link to="/login">
             <Button size="lg" className="rounded-full cursor-pointer">Start Shopping</Button>
           </Link>
-          <Button size="lg" className="rounded-full" variant="secondary">Become a Vendor</Button>
         </div>
       </div>
     </div>
