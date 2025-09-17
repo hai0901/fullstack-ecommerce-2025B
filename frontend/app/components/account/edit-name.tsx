@@ -8,8 +8,13 @@ import { customerFormSchema } from "~/lib/schemas";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import api from "~/utils/api";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export default function EditNameCard({ user, dispatch }: { user: User, dispatch: AppDispatch }) {
+  const [isLoading, setIsLoading] = useState(false);
+  
   const customerForm = useForm<z.infer<typeof customerFormSchema>>({
     resolver: zodResolver(customerFormSchema),
     mode: "onChange",
@@ -17,10 +22,37 @@ export default function EditNameCard({ user, dispatch }: { user: User, dispatch:
       name: user.name as string
     }
   });
-  const onSubmit = () => {
-    console.log();
-  }
-  const invalidForm = customerForm.watch("name") === user.name || customerForm.getFieldState("name", customerForm.formState).invalid; //Could have done by extending zod obj?
+  
+  const onSubmit = async (values: z.infer<typeof customerFormSchema>) => {
+    try {
+      setIsLoading(true);
+      
+      // Prepare update data based on user role
+      const updateData: any = {};
+      if (user.role === 'customer') {
+        updateData.name = values.name;
+      } else if (user.role === 'vendor') {
+        updateData.businessName = values.name;
+      }
+      
+      const response = await api.put('/auth/profile', updateData);
+      
+      // Update Redux state with backend response
+      dispatch({
+        type: 'auth/updateUser',
+        payload: response.data.user
+      });
+      
+      toast.success('Name updated successfully');
+    } catch (error: any) {
+      console.error('Error updating name:', error);
+      toast.error(error.response?.data?.error || 'Failed to update name');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const invalidForm = customerForm.watch("name") === user.name || customerForm.getFieldState("name", customerForm.formState).invalid;
 
   return (
     <div className="flex p-6 pb-10 gap-6">
@@ -56,7 +88,9 @@ export default function EditNameCard({ user, dispatch }: { user: User, dispatch:
                     </Popover>
                   )}
                 />
-                <Button disabled={invalidForm} type="submit" variant="outline">Save</Button>
+                <Button disabled={invalidForm || isLoading} type="submit" variant="outline">
+                  {isLoading ? 'Saving...' : 'Save'}
+                </Button>
               </form>
             </Form>
           </div>

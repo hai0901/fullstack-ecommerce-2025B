@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/button";
 import { Search } from "lucide-react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
+import { useAppSelector } from "~/hooks/redux-hooks";
 
 interface Product {
   id: string;
@@ -42,11 +43,15 @@ export default function Shop() {
     hasPrev: false
   });
   const [error, setError] = useState<string | null>(null);
+  const [appliedFilters, setAppliedFilters] = useState<any>({});
   const observerRef = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  
+  // Get filter state from Redux
+  const filterItems = useAppSelector(state => state.filterItems);
 
   // Fetch products function
-  const fetchProducts = useCallback(async (page: number = 1, reset: boolean = false) => {
+  const fetchProducts = useCallback(async (page: number = 1, reset: boolean = false, filters: any = appliedFilters) => {
     try {
       if (reset) {
         setLoading(true);
@@ -63,6 +68,20 @@ export default function Shop() {
       if (searchQuery.trim()) {
         params.append('search', searchQuery.trim());
       }
+
+      // Add filter parameters
+      if (filters.category) {
+        params.append('category', filters.category);
+      }
+      if (filters.minPrice) {
+        params.append('minPrice', filters.minPrice.toString());
+      }
+      if (filters.maxPrice) {
+        params.append('maxPrice', filters.maxPrice.toString());
+      }
+
+      console.log('API request URL:', `http://localhost:5000/api/products/shop?${params}`);
+      console.log('Request parameters:', Object.fromEntries(params.entries()));
 
       const response = await axios.get(`http://localhost:5000/api/products/shop?${params}`);
       const { products: newProducts, pagination: newPagination } = response.data;
@@ -81,7 +100,7 @@ export default function Shop() {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [searchQuery]);
+  }, [searchQuery, appliedFilters]);
 
   // Load more products
   const loadMore = useCallback(() => {
@@ -136,10 +155,42 @@ export default function Shop() {
     }
   };
 
+  // Apply filters function
+  const handleApplyFilters = () => {
+    const filters: any = {};
+    
+    // Process filter items from Redux state
+    filterItems.forEach(item => {
+      if (item.id === 'priceRange') {
+        const priceRange = item.description as number[];
+        if (priceRange && priceRange.length === 2) {
+          // Only apply price filter if it's not the default range
+          if (priceRange[0] > 0 || priceRange[1] < 1000000) {
+            filters.minPrice = priceRange[0];
+            filters.maxPrice = priceRange[1];
+          }
+        }
+      } else {
+        // All other items are categories (they use category._id as id)
+        // For now, we'll take the first category if multiple are selected
+        // TODO: Support multiple categories if needed
+        if (!filters.category) {
+          filters.category = item.description;
+        }
+      }
+    });
+    
+    console.log('Applying filters:', filters);
+    console.log('Filter items from Redux:', filterItems);
+    
+    setAppliedFilters(filters);
+    fetchProducts(1, true, filters);
+  };
+
   return (
     <div id="shop" className="w-full h-[fit] bg-black flex flex-col items-center">
       <div className="flex flex-row w-[1448px]"> 
-        <FilterArea />
+        <FilterArea onApplyFilters={handleApplyFilters} />
         <section className="w-full h-auto border-t">
           {/* Search Bar */}
           <div className="p-4 border-b">

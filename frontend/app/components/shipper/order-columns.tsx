@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { ChevronsUpDown, ArrowDown01, ArrowUp10, EyeOff, MoreHorizontal, ArrowUpAZ, ArrowDownZA, CircleDashed, CircleCheck } from "lucide-react"
+import { ChevronsUpDown, ArrowDown01, ArrowUp10, EyeOff, MoreHorizontal, ArrowUpAZ, ArrowDownZA, CircleDashed, CircleCheck, X } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +27,7 @@ export type Order = {
 export interface OrderViewActions {
   onView: (order: Order) => void;
   onUpdateStatus: (orderId: string, status: 'delivered' | 'cancelled') => void;
+  onStatusFilter?: (status: string | undefined) => void;
 }
 
 export const createColumns = (actions: OrderViewActions): ColumnDef<Order>[] => [
@@ -151,13 +152,16 @@ export const createColumns = (actions: OrderViewActions): ColumnDef<Order>[] => 
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuItem onClick={() => column.setFilterValue('active')}>
+          <DropdownMenuItem onClick={() => actions.onStatusFilter?.('active')}>
             <CircleDashed className="size-4 mr-2" /> Active
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => column.setFilterValue('delivered')}>
+          <DropdownMenuItem onClick={() => actions.onStatusFilter?.('delivered')}>
             <CircleCheck className="size-4 mr-2" /> Delivered
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => column.setFilterValue(undefined)}>
+          <DropdownMenuItem onClick={() => actions.onStatusFilter?.('cancelled')}>
+            <X className="size-4 mr-2" /> Cancelled
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => actions.onStatusFilter?.(undefined)}>
             Show All
           </DropdownMenuItem>
         </DropdownMenuContent>

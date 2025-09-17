@@ -11,7 +11,6 @@ import {
 } from "./ui/navigation-menu"
 import { Link } from "react-router";
 import { LogOut, PersonStanding, ShoppingCart } from "lucide-react";
-import { NavBarSearch } from "./search";
 import { Badge } from "./ui/badge";
 import { cn } from "~/lib/utils";
 import { useAppDispatch, useAppSelector } from "~/hooks/redux-hooks";
@@ -35,65 +34,64 @@ export default function NavBar() {
             height="20"
           />
         </Link>
-        {user.role?.toLowerCase() === "customer" &&
-          <div className="flex flex-row w-full gap-3 pl-24 justify-center">
-            <NavBarSearch />
-            <Link to="/cart">
-              <Button variant="ghost" className="cursor-pointer relative">
-                <ShoppingCart size={32} />
-                {cart.items.length > 0 && (
-                  <Badge className="absolute -top-1 -right-1 h-5 min-w-5 rounded-full p-0.5 font-mono tabular-nums">
-                    {cart.items.reduce((total, item) => total + item.quantity, 0)}
-                  </Badge>
-                )}
-              </Button>
-            </Link>
-          </div>
-        }
         <div className="flex flex-row gap-3">
           {
             user.isAuthenticated ? 
-            <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>
-                  <Avatar>
-                    <AvatarImage src={user.profilePicture as string} />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-                  <p className="text-sm mx-3">{user.name}</p>
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="w-35">
-                    <li>
-                      <NavigationMenuLink>
-                        <Link className="flex gap-3 items-center" to="/account">
-                          <PersonStanding />
-                          My Account
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink>
-                        <Link 
-                          className="flex gap-3 items-center" 
-                          onClick={async () => {
-                            try {
-                              await axios.post('http://localhost:5000/api/auth/logout', {}, { withCredentials: true });
-                            } catch {}
-                            dispatch(logout());
-                          }}
-                          to="/login">
-                          <LogOut />
-                          Log Out
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-            </NavigationMenu>
+            <>
+              {user.role?.toLowerCase() === "customer" && (
+                <Link to="/cart">
+                  <Button variant="ghost" className="cursor-pointer relative">
+                    <ShoppingCart size={32} />
+                    {cart.items.length > 0 && (
+                      <Badge className="absolute -top-1 -right-1 h-5 min-w-5 rounded-full p-0.5 font-mono tabular-nums">
+                        {cart.items.reduce((total, item) => total + item.quantity, 0)}
+                      </Badge>
+                    )}
+                  </Button>
+                </Link>
+              )}
+              <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>
+                    <Avatar>
+                      <AvatarImage src={user.profilePicture as string} />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
+                    <p className="text-sm mx-3">{user.name}</p>
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="w-35">
+                      <li>
+                        <NavigationMenuLink>
+                          <Link className="flex gap-3 items-center" to="/account">
+                            <PersonStanding />
+                            My Account
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink>
+                          <Link 
+                            className="flex gap-3 items-center" 
+                            onClick={async () => {
+                              try {
+                                await axios.post('http://localhost:5000/api/auth/logout', {}, { withCredentials: true });
+                              } catch {}
+                              dispatch(logout());
+                            }}
+                            to="/login">
+                            <LogOut />
+                            Log Out
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+              </NavigationMenu>
+            </>
             :
             <>
               <Link to="/login">

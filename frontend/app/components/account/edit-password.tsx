@@ -8,36 +8,59 @@ import { customerFormSchema } from "~/lib/schemas";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios"; 
-import { useMutation, useQuery } from '@tanstack/react-query'
+import api from "~/utils/api";
+import { toast } from "sonner";
+import { useState } from "react";
 
-export async function getPassword(username: string) {
-  const result = await axios.get("https://qrandom.io/api/random/string");
-  console.log("result from getPassword(): ", result);
-  return result;
-}
+// Create a schema for password update
+const passwordUpdateSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z
+    .string({message: "Please enter password."})
+    .min(8, {message: "Password must be at least 8 characters."})
+    .max(20, {message: "Password must be at most 20 characters."})
+    .regex(/[a-z]/, {message: "Password must contain at least one lowercase letter"})
+    .regex(/[A-Z]/, {message: "Password must contain at least one uppercase letter"})
+    .regex(/[0-9]/, {message: "Password must contain at least one number"})
+    .regex(/[^a-zA-Z0-9]/, {message: "Password must contain at least one special character"})
+});
 
 export default function EditPassword({ user, dispatch }: { user: User, dispatch: AppDispatch }) {
-  const password = useQuery({ 
-    queryKey: ['password'], 
-    queryFn: () => getPassword(user.username as string) 
-  });
-  const customerForm = useForm<z.infer<typeof customerFormSchema>>({
-    resolver: zodResolver(customerFormSchema),
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const passwordForm = useForm<z.infer<typeof passwordUpdateSchema>>({
+    resolver: zodResolver(passwordUpdateSchema),
     mode: "onChange",
     defaultValues: {
-      password: user.address as string
+      currentPassword: "",
+      newPassword: ""
     }
   });
-  const mutation = useMutation({
-    mutationFn: (newPassword: string) => {
-      return axios.post("new password", newPassword);
-    },
-  });
-  const onSubmit = (values: z.infer<typeof customerFormSchema>) => {
-    mutation.mutate(values.password);
-  }
-  const invalidForm = customerForm.watch("password") === user.address || customerForm.getFieldState("address", customerForm.formState).invalid; 
+  
+  const onSubmit = async (values: z.infer<typeof passwordUpdateSchema>) => {
+    try {
+      setIsLoading(true);
+      
+      await api.put('/auth/password', {
+        currentPassword: values.currentPassword,
+        newPassword: values.newPassword
+      });
+      
+      // Clear form
+      passwordForm.reset();
+      
+      toast.success('Password updated successfully');
+    } catch (error: any) {
+      console.error('Error updating password:', error);
+      toast.error(error.response?.data?.error || 'Failed to update password');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const invalidForm = !passwordForm.formState.isValid || 
+    passwordForm.watch("currentPassword") === "" || 
+    passwordForm.watch("newPassword") === ""; 
 
   return (
     <div className="flex p-6 pb-10 gap-6">
@@ -45,40 +68,46 @@ export default function EditPassword({ user, dispatch }: { user: User, dispatch:
         <h2 className="text-xl tracking-tight">Password</h2>
         <div className="flex flex-col gap-3 font-light text-sm text-muted-foreground">
           <p className="font-light">This is your password. Follow our password requirements to secure your account.</p>
-          <div className="flex gap-3 w-full">
-            <Form {...customerForm}>
-              <form onSubmit={customerForm.handleSubmit(onSubmit)}>
+          <div className="flex flex-col gap-3 w-full">
+            <Form {...passwordForm}>
+              <form onSubmit={passwordForm.handleSubmit(onSubmit)} className="flex flex-col gap-3">
                 <FormField 
-                  control={customerForm.control}
-                  name="address"
+                  control={passwordForm.control}
+                  name="currentPassword"
                   render={({ field }) => (
-                    <Popover>
-                      <PopoverTrigger>
-                        <FormControl>
-                          <Input 
-                            className="text-white"
-                            {...field}
-                          />
-                        </FormControl>
-                      </PopoverTrigger>
-                        <PopoverContent
-                          onOpenAutoFocus={(e) => e.preventDefault()}
-                          className="w-full"
-                          sideOffset={10}
-                        >
-                          <ol className="text-xs text-muted-foreground">
-                            <li>
-                              Allowed characters: letters and digits.
-                            </li>
-                            <li>
-                              Length: 2 characters minimum.
-                            </li>
-                          </ol>
-                        </PopoverContent>
-                    </Popover>
+                    <FormItem>
+                      <FormControl>
+                        <Input 
+                          type="password"
+                          placeholder="Current Password"
+                          className="text-white"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
                 />
-                <Button disabled={invalidForm} type="submit" variant="outline">Save</Button>
+                <FormField 
+                  control={passwordForm.control}
+                  name="newPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input 
+                          type="password"
+                          placeholder="New Password"
+                          className="text-white"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button disabled={invalidForm || isLoading} type="submit" variant="outline">
+                  {isLoading ? 'Saving...' : 'Save'}
+                </Button>
               </form>
             </Form>
           </div>

@@ -8,8 +8,13 @@ import { customerFormSchema } from "~/lib/schemas";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import api from "~/utils/api";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export default function EditAddressCard({ user, dispatch }: { user: User, dispatch: AppDispatch }) {
+  const [isLoading, setIsLoading] = useState(false);
+  
   const customerForm = useForm<z.infer<typeof customerFormSchema>>({
     resolver: zodResolver(customerFormSchema),
     mode: "onChange",
@@ -17,9 +22,36 @@ export default function EditAddressCard({ user, dispatch }: { user: User, dispat
       address: user.address as string
     }
   });
-  const onSubmit = () => {
-    console.log();
-  }
+  
+  const onSubmit = async (values: z.infer<typeof customerFormSchema>) => {
+    try {
+      setIsLoading(true);
+      
+      // Prepare update data based on user role
+      const updateData: any = {};
+      if (user.role === 'customer') {
+        updateData.address = values.address;
+      } else if (user.role === 'vendor') {
+        updateData.businessAddress = values.address;
+      }
+      
+      const response = await api.put('/auth/profile', updateData);
+      
+      // Update Redux state with backend response
+      dispatch({
+        type: 'auth/updateUser',
+        payload: response.data.user
+      });
+      
+      toast.success('Address updated successfully');
+    } catch (error: any) {
+      console.error('Error updating address:', error);
+      toast.error(error.response?.data?.error || 'Failed to update address');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   const invalidForm = customerForm.watch("address") === user.address || customerForm.getFieldState("address", customerForm.formState).invalid; 
 
   return (
@@ -61,7 +93,9 @@ export default function EditAddressCard({ user, dispatch }: { user: User, dispat
                     </Popover>
                   )}
                 />
-                <Button disabled={invalidForm} type="submit" variant="outline">Save</Button>
+                <Button disabled={invalidForm || isLoading} type="submit" variant="outline">
+                  {isLoading ? 'Saving...' : 'Save'}
+                </Button>
               </form>
             </Form>
           </div>

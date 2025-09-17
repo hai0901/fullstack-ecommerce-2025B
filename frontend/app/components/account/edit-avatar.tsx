@@ -7,6 +7,9 @@ import { Avatar, AvatarImage, AvatarFallback } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import type { User } from "~/features/authentication/authenticationSlice";
 import type { AppDispatch } from "~/store";
+import api from "~/utils/api";
+import { toast } from "sonner";
+import { updateUser } from "~/features/authentication/authenticationSlice";
 
 export default function EditAvatarCard({ user, dispatch }: { user: User, dispatch: AppDispatch }) {
   const [avatarURL, setAvatarURL] = useState("");
@@ -14,6 +17,7 @@ export default function EditAvatarCard({ user, dispatch }: { user: User, dispatc
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [noClick, setNoClick] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const onDrop = useCallback((acceptedFiles: any) => {
     acceptedFiles.forEach((file: any) => {
       const reader = new FileReader()
@@ -49,6 +53,38 @@ export default function EditAvatarCard({ user, dispatch }: { user: User, dispatc
     const croppedImgSrc = getCroppedImgSrc(avatarURL, croppedAreaPixels);
     setCroppedImgURL(croppedImgSrc);
   }
+
+  const handleSaveAvatar = async () => {
+    if (!croppedImgURL) {
+      toast.error('Please crop your image first');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      
+      const response = await api.put('/auth/profile-picture', {
+        profilePicture: croppedImgURL
+      });
+      
+      console.log('response: ', response);
+
+      // Update Redux state with backend response
+      dispatch(updateUser(response.data.user));
+      
+      // Reset states
+      setAvatarURL("");
+      setCroppedImgURL("");
+      setNoClick(false);
+      
+      toast.success('Profile picture updated successfully');
+    } catch (error: any) {
+      console.error('Error updating profile picture:', error);
+      toast.error(error.response?.data?.error || 'Failed to update profile picture');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex p-6 pb-10 gap-6">
@@ -102,9 +138,10 @@ export default function EditAvatarCard({ user, dispatch }: { user: User, dispatc
                 <Button variant="secondary" onClick={open}>Use a Different Image</Button>
               </div>
               <Button 
-                onClick={() => setNoClick(false)}
+                onClick={handleSaveAvatar}
+                disabled={!croppedImgURL || isLoading}
               >
-                Save
+                {isLoading ? 'Saving...' : 'Save'}
               </Button>
             </div>
           </div>

@@ -8,8 +8,13 @@ import { customerFormSchema } from "~/lib/schemas";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import api from "~/utils/api";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export default function EditUsermameCard({ user, dispatch }: { user: User, dispatch: AppDispatch }) {
+  const [isLoading, setIsLoading] = useState(false);
+  
   const customerForm = useForm<z.infer<typeof customerFormSchema>>({
     resolver: zodResolver(customerFormSchema),
     mode: "onChange",
@@ -17,9 +22,30 @@ export default function EditUsermameCard({ user, dispatch }: { user: User, dispa
       username: user.username as string
     }
   });
-  const onSubmit = () => {
-    console.log();
-  }
+  
+  const onSubmit = async (values: z.infer<typeof customerFormSchema>) => {
+    try {
+      setIsLoading(true);
+      
+      const response = await api.put('/auth/username', {
+        newUsername: values.username
+      });
+      
+      // Update Redux state with backend response
+      dispatch({
+        type: 'auth/updateUser',
+        payload: response.data.user
+      });
+      
+      toast.success('Username updated successfully');
+    } catch (error: any) {
+      console.error('Error updating username:', error);
+      toast.error(error.response?.data?.error || 'Failed to update username');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   const invalidForm = customerForm.watch("username") === user.username || customerForm.getFieldState("username", customerForm.formState).invalid; 
 
   return (
@@ -61,7 +87,9 @@ export default function EditUsermameCard({ user, dispatch }: { user: User, dispa
                     </Popover>
                   )}
                 />
-                <Button disabled={invalidForm} type="submit" variant="outline">Save</Button>
+                <Button disabled={invalidForm || isLoading} type="submit" variant="outline">
+                  {isLoading ? 'Saving...' : 'Save'}
+                </Button>
               </form>
             </Form>
           </div>

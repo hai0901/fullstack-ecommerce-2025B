@@ -11,7 +11,7 @@ import EditAddressCard from "~/components/account/edit-address";
 import EditPassword from "~/components/account/edit-password";
 import { Link } from "react-router";
 import { logout } from "~/features/authentication/authenticationSlice";
-import axios from "axios";
+import api from "~/utils/api";
 
 export default function AccountPage() {
   const user = useAppSelector(state => state.auth);
@@ -54,7 +54,7 @@ export default function AccountPage() {
                 to="/login"
                 onClick={async () => {
                   try {
-                    await axios.post('http://localhost:5000/api/auth/logout', {}, { withCredentials: true });
+                    await api.post('/auth/logout');
                   } catch {}
                   dispatch(logout());
                 }}

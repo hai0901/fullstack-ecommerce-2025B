@@ -262,8 +262,8 @@ export default function VendorProducts() {
       </div>
       <div className="container mx-auto py-10 flex-1 flex flex-col">
         <div className="flex-1 flex flex-col">
-            <DataTable
-              columns={columns}
+        <DataTable
+          columns={columns}
               data={paginatedProducts}
           renderToolbar={(table) => (
             <div className="flex items-center justify-between gap-3">

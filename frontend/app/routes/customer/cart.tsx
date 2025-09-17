@@ -11,46 +11,13 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "~/components/ui/alert-dialog";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table";
-import { ScrollArea } from "~/components/ui/scroll-area";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogClose,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogTrigger,
-} from "~/components/ui/dialog";
 import { useAppSelector, useAppDispatch } from "~/hooks/redux-hooks";
 import { updateQuantity, removeFromCart, clearCart } from "~/features/cart/cartSlice";
 import { useNavigate } from "react-router";
-import { useState } from "react";
 import { toast } from "sonner";
 import axios from "axios";
+import { useState } from "react";
 
-const mockImg = "https://cdn.vuahanghieu.com/unsafe/0x900/left/top/smart/filters:quality(90)/https://admin.vuahanghieu.com/upload/product/2024/08/moc-khoa-pop-mart-labubu-macaron-green-grape-mau-xanh-la-66b094ec488c7-05082024160132.jpg";
 
 interface CartItemProps {
   item: {
@@ -126,7 +93,7 @@ export default function CartPage() {
   const navigate = useNavigate();
   const { items, total } = useAppSelector(state => state.cart);
   const user = useAppSelector(state => state.auth);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
   const handleClearCart = () => {
     dispatch(clearCart());
@@ -139,9 +106,11 @@ export default function CartPage() {
       return;
     }
 
+    setIsPlacingOrder(true);
+
     try {
       // Create order with random distribution hub
-      const distributionHubs = ["Hub A", "Hub B", "Hub C", "Hub D"];
+      const distributionHubs = ["danang", "hochiminh", "hanoi"];
       const randomHub = distributionHubs[Math.floor(Math.random() * distributionHubs.length)];
 
       const orderData = {
@@ -152,24 +121,32 @@ export default function CartPage() {
           price: item.price
         })),
         totalPrice: total,
-        distributionHub: randomHub,
-        status: "active"
+        distributionHub: randomHub
       };
 
-      // TODO: Replace with actual API call
       console.log("Creating order:", orderData);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Call the backend API
+      const response = await axios.post('http://localhost:5000/api/orders', orderData);
       
       // Clear cart and show success
       dispatch(clearCart());
-      toast.success(`Order created successfully! Assigned to ${randomHub}`);
-      setIsCheckoutOpen(false);
+      
+      // Map hub identifiers to proper city names
+      const hubNames: { [key: string]: string } = {
+        'danang': 'Da Nang',
+        'hanoi': 'Ha Noi',
+        'hochiminh': 'Ho Chi Minh'
+      };
+      
+      const hubDisplayName = hubNames[randomHub] || randomHub;
+      toast.success(`Order created successfully! Assigned to ${hubDisplayName} distribution hub`);
       
     } catch (error) {
       console.error("Error creating order:", error);
       toast.error("Failed to create order. Please try again.");
+    } finally {
+      setIsPlacingOrder(false);
     }
   };
 
@@ -244,178 +221,14 @@ export default function CartPage() {
               </div>
             </CardContent>
             <CardFooter className="flex-col gap-2">
-              <AlertDialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
-                <AlertDialogTrigger asChild>
-                  <Button type="submit" className="w-full cursor-pointer">
-                    Order
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent className="max-w-4xl w-[800px]">
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="text-center tracking-tight">Let's review your order</AlertDialogTitle>
-                    <AlertDialogDescription className="text-center">
-                      <Table>
-                        <TableBody>
-                          <ScrollArea className="h-100">
-                            <TableRow>
-                              <TableCell>
-                                <img className="w-16 h-16 rounded-md" src={mockImg} alt="Product Image" />
-                                Product Name
-                              </TableCell>
-                              <TableCell>
-                                Vendor Name
-                              </TableCell>
-                              <TableCell>
-                                10000
-                              </TableCell>
-                              <TableCell>
-                                1
-                              </TableCell>
-                              <TableCell>
-                                10000
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>
-                                <img className="w-16 h-16 rounded-md" src={mockImg} alt="Product Image" />
-                                Product Name
-                              </TableCell>
-                              <TableCell>
-                                Vendor Name
-                              </TableCell>
-                              <TableCell>
-                                10000
-                              </TableCell>
-                              <TableCell>
-                                1
-                              </TableCell>
-                              <TableCell>
-                                10000
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>
-                                <img className="w-16 h-16 rounded-md" src={mockImg} alt="Product Image" />
-                                Product Name
-                              </TableCell>
-                              <TableCell>
-                                Vendor Name
-                              </TableCell>
-                              <TableCell>
-                                10000
-                              </TableCell>
-                              <TableCell>
-                                1
-                              </TableCell>
-                              <TableCell>
-                                10000
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>
-                                <img className="w-16 h-16 rounded-md" src={mockImg} alt="Product Image" />
-                                Product Name
-                              </TableCell>
-                              <TableCell>
-                                Vendor Name
-                              </TableCell>
-                              <TableCell>
-                                10000
-                              </TableCell>
-                              <TableCell>
-                                1
-                              </TableCell>
-                              <TableCell>
-                                10000
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>
-                                <img className="w-16 h-16 rounded-md" src={mockImg} alt="Product Image" />
-                                Product Name
-                              </TableCell>
-                              <TableCell>
-                                Vendor Name
-                              </TableCell>
-                              <TableCell>
-                                10000
-                              </TableCell>
-                              <TableCell>
-                                1
-                              </TableCell>
-                              <TableCell>
-                                10000
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>
-                                <img className="w-16 h-16 rounded-md" src={mockImg} alt="Product Image" />
-                                Product Name
-                              </TableCell>
-                              <TableCell>
-                                Vendor Name
-                              </TableCell>
-                              <TableCell>
-                                10000
-                              </TableCell>
-                              <TableCell>
-                                1
-                              </TableCell>
-                              <TableCell>
-                                10000
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>
-                                <img className="w-16 h-16 rounded-md" src={mockImg} alt="Product Image" />
-                                Product Name
-                              </TableCell>
-                              <TableCell>
-                                Vendor Name
-                              </TableCell>
-                              <TableCell>
-                                10000
-                              </TableCell>
-                              <TableCell>
-                                1
-                              </TableCell>
-                              <TableCell>
-                                10000
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>
-                                <img className="w-16 h-16 rounded-md" src={mockImg} alt="Product Image" />
-                                Product Name
-                              </TableCell>
-                              <TableCell>
-                                Vendor Name
-                              </TableCell>
-                              <TableCell>
-                                10000
-                              </TableCell>
-                              <TableCell>
-                                1
-                              </TableCell>
-                              <TableCell>
-                                10000
-                              </TableCell>
-                            </TableRow> 
-                          </ScrollArea>                                                   
-                        </TableBody>
-                      </Table>
-                      <div className="flex justify-between py-6 px-4">
-                        <p>Total</p>
-                        <p>100000</p>
-                      </div>
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter className="flex justify-between">
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleCheckout}>Place Order</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              <Button 
+                type="submit" 
+                className="w-full cursor-pointer"
+                onClick={handleCheckout}
+                disabled={isPlacingOrder}
+              >
+                {isPlacingOrder ? "Placing Order..." : "Place Order"}
+              </Button>
             </CardFooter>
           </Card>
         </aside>

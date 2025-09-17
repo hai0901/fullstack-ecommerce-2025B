@@ -8,28 +8,49 @@ exports.getShopProducts = async (req, res) => {
     const search = req.query.search || '';
     const category = req.query.category || '';
     const minPrice = parseFloat(req.query.minPrice) || 0;
-    const maxPrice = parseFloat(req.query.maxPrice) || Infinity;
+    const maxPrice = parseFloat(req.query.maxPrice) || 1000000;
 
-    // Build filter object
+    // Validate parameters
+    if (page < 1) {
+      return res.status(400).json({ error: 'Page must be greater than 0' });
+    }
+    if (limit < 1 || limit > 100) {
+      return res.status(400).json({ error: 'Limit must be between 1 and 100' });
+    }
+    if (minPrice < 0) {
+      return res.status(400).json({ error: 'Minimum price cannot be negative' });
+    }
+    if (maxPrice < minPrice) {
+      return res.status(400).json({ error: 'Maximum price cannot be less than minimum price' });
+    }
+
+    // Log filter parameters for debugging
+    console.log('Filter parameters:', { search, category, minPrice, maxPrice, page, limit });
+
+    // Build filter object - all conditions must be met (AND logic)
     const filter = {
       isDeleted: false
     };
 
-    // Add search filter
-    if (search) {
+    // Add search filter (case-insensitive search in name and description)
+    if (search && search.trim()) {
       filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
+        { name: { $regex: search.trim(), $options: 'i' } },
+        { description: { $regex: search.trim(), $options: 'i' } }
       ];
     }
 
-    // Add category filter
-    if (category) {
-      const categoryDoc = await Category.findOne({ name: category, isDeleted: false });
+    // Add category filter (exact match)
+    if (category && category.trim()) {
+      const categoryDoc = await Category.findOne({ 
+        name: { $regex: new RegExp(`^${category.trim()}$`, 'i') }, 
+        isDeleted: false 
+      });
       if (categoryDoc) {
         filter.categoryId = categoryDoc._id;
       } else {
         // If category doesn't exist, return empty results
+        console.log('Category not found:', category);
         return res.json({
           products: [],
           pagination: {
@@ -43,18 +64,26 @@ exports.getShopProducts = async (req, res) => {
       }
     }
 
-    // Add price range filter
-    if (minPrice > 0 || maxPrice < Infinity) {
+    // Add price range filter (inclusive range)
+    if (minPrice > 0 || maxPrice < 1000000) {
       filter.price = {};
-      if (minPrice > 0) filter.price.$gte = minPrice;
-      if (maxPrice < Infinity) filter.price.$lte = maxPrice;
+      if (minPrice > 0) {
+        filter.price.$gte = minPrice;
+      }
+      if (maxPrice < 1000000) {
+        filter.price.$lte = maxPrice;
+      }
     }
+
+    // Log final filter object for debugging
+    console.log('Final filter object:', JSON.stringify(filter, null, 2));
 
     // Calculate skip value for pagination
     const skip = (page - 1) * limit;
 
     // Get total count for pagination
     const totalProducts = await Product.countDocuments(filter);
+    console.log('Total products found:', totalProducts);
 
     // Get products with pagination
     const products = await Product.find(filter)
@@ -99,6 +128,12 @@ exports.getShopProducts = async (req, res) => {
         totalProducts,
         hasNext,
         hasPrev
+      },
+      filters: {
+        search: search || null,
+        category: category || null,
+        minPrice: minPrice > 0 ? minPrice : null,
+        maxPrice: maxPrice < 1000000 ? maxPrice : null
       }
     });
 

@@ -8,7 +8,7 @@ import {
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { CircleDashed, CircleCheck, X } from "lucide-react";
-import { Order } from "./order-columns";
+import { type Order } from "./order-columns";
 import {
   Table,
   TableBody,
@@ -17,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { ScrollArea } from "~/components/ui/scroll-area";
 
 interface OrderDetailModalProps {
   order: Order | null;
@@ -59,6 +60,15 @@ export default function OrderDetailModal({
     );
   };
 
+  const getHubDisplayName = (hub: string) => {
+    const hubMapping: { [key: string]: string } = {
+      'danang': 'Da Nang',
+      'hochiminh': 'Ho Chi Minh',
+      'hanoi': 'Hanoi'
+    };
+    return hubMapping[hub] || hub;
+  };
+
   const handleDeliver = () => {
     onUpdateStatus(order.id, 'delivered');
     onClose();
@@ -71,7 +81,7 @@ export default function OrderDetailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">Order Details</DialogTitle>
           <DialogDescription>
@@ -79,10 +89,10 @@ export default function OrderDetailModal({
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Order Summary */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-3">
               <div>
                 <h3 className="font-semibold text-lg mb-2">Order Information</h3>
                 <div className="space-y-2">
@@ -111,14 +121,14 @@ export default function OrderDetailModal({
                   {order.distributionHub && (
                     <div>
                       <span className="font-medium">Distribution Hub:</span>
-                      <span className="ml-2">{order.distributionHub}</span>
+                      <span className="ml-2">{getHubDisplayName(order.distributionHub)}</span>
                     </div>
                   )}
                 </div>
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div>
                 <h3 className="font-semibold text-lg mb-2">Customer Information</h3>
                 <div className="space-y-2">
@@ -137,39 +147,39 @@ export default function OrderDetailModal({
 
           {/* Products Table */}
           <div>
-            <h3 className="font-semibold text-lg mb-4">Products in Order</h3>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Product</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Description</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {order.products.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <img 
-                          src={product.image} 
-                          alt={product.name}
-                          className="w-12 h-12 object-cover rounded-md"
-                        />
-                        <div>
-                          <div className="font-medium">{product.name}</div>
-                          <div className="text-sm text-muted-foreground">ID: {product.id}</div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{product.category}</TableCell>
-                    <TableCell>{product.price.toLocaleString()} VND</TableCell>
-                    <TableCell className="max-w-xs truncate">{product.description}</TableCell>
+            <h3 className="font-semibold text-lg mb-3">Products in Order</h3>
+            <ScrollArea className="h-48 w-full border rounded-md">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Product</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Description</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {order.products.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <img 
+                            src={product.image} 
+                            alt={product.name}
+                            className="w-10 h-10 object-cover rounded-md"
+                          />
+                          <div>
+                            <div className="font-medium text-sm">{product.name}</div>
+                            <div className="text-xs text-muted-foreground">ID: {product.id}</div>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm">{product.price.toLocaleString()} VND</TableCell>
+                      <TableCell className="max-w-xs truncate text-sm">{product.description}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </ScrollArea>
           </div>
 
           {/* Actions */}

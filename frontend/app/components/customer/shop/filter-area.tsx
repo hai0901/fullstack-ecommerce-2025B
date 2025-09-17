@@ -5,10 +5,13 @@ import { Separator } from "~/components/ui/separator";
 import { Switch } from "~/components/ui/switch";
 import PriceRange from "./price-range";
 import Category from "./category";
-import { useAppSelector } from "~/hooks/redux-hooks";
 import Filter from "./filter";
 
-export default function FilterArea() {
+interface FilterAreaProps {
+  onApplyFilters: () => void;
+}
+
+export default function FilterArea({ onApplyFilters }: FilterAreaProps) {
   return (
     <aside className="flex flex-col w-[418.5px] border-l h-auto text-muted-foreground">
       <Filter />
@@ -19,6 +22,17 @@ export default function FilterArea() {
 
       <Category />
       <Separator />
+
+      {/* Apply Filters Button */}
+      <div className="p-6">
+        <Button 
+          onClick={onApplyFilters}
+          className="w-full"
+          size="lg"
+        >
+          Apply Filters
+        </Button>
+      </div>
 
       {/* <div className="p-6 pr-7">
         <div className="flex flex-row justify-between">

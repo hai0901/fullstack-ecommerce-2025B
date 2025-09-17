@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from "~/hooks/redux-hooks";
 export default function PriceRange() {
   const filterItems = useAppSelector(state => state.filterItems);
   const priceRangeInFilter = filterItems.find(item => item.id === "priceRange");
-  const priceRange = priceRangeInFilter ? priceRangeInFilter.description as number[] : [0, 10000000];
+  const priceRange = priceRangeInFilter ? priceRangeInFilter.description as number[] : [0, 1000000];
   const rangeStart = priceRange[0] ? priceRange[0].toLocaleString('vi-VN') : 0;
   const rangeEnd = priceRange[1] ? priceRange[1].toLocaleString('vi-VN') : 0;
   const dispatch = useAppDispatch();
@@ -53,7 +53,7 @@ export default function PriceRange() {
           type="number"
           value={priceRange[1]}
           min={priceRange[0]}
-          max={10000000}
+          max={1000000}
           onChange={(e) => handlePriceChange(parseInt(e.target.value), "end")}  
           className="w-28"
         />
@@ -62,7 +62,7 @@ export default function PriceRange() {
         value={priceRange}
         step={50000} 
         min={0}
-        max={10000000}
+        max={1000000}
         minStepsBetweenThumbs={1}
         onValueChange={(value) => handlePriceChange(value, undefined, true)}
       />

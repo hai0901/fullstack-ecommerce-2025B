@@ -62,11 +62,6 @@ export default function ShipperSignUpCard() {
 
   const onSubmit = async (values: z.infer<typeof shipperSignUpFormSchema>) => {
     try {
-      const hubMap: Record<string, string> = {
-        hochiminh: 'Ho Chi Minh',
-        hanoi: 'Hanoi',
-        danang: 'Da Nang',
-      };
       const res = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -74,7 +69,7 @@ export default function ShipperSignUpCard() {
           username: values.username,
           password: values.password,
           role: 'shipper',
-          distributionHub: hubMap[values.distributionHub as keyof typeof hubMap],
+          distributionHub: values.distributionHub, // Send the raw value (hochiminh, hanoi, danang)
           avatarDataUrl: (croppedImgURL || avatarURL) || undefined,
         }),
       });

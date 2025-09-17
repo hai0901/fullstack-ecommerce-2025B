@@ -95,21 +95,21 @@ export default function Product({ params }: Route.ComponentProps) {
     return (
       <Dialog open={true} onOpenChange={(open) => { if (!open) navigate("/shop"); }}>
         <DialogContent className="flex gap-6 w-fit">
-          <div className="w-60 h-60 border border-gray-600 animate-pulse" />
+          <div className="w-60 h-60 bg-border animate-pulse" />
           <div className="flex flex-col justify-between">
             <div>
-              <div className="h-6 border border-gray-600 animate-pulse mb-2" />
-              <div className="h-4 border border-gray-600 animate-pulse mb-2" />
-              <div className="h-4 border border-gray-600 animate-pulse mb-3" />
-              <div className="h-6 border border-gray-600 animate-pulse" />
+              <div className="h-6 bg-border animate-pulse mb-2" />
+              <div className="h-4 bg-border animate-pulse mb-2" />
+              <div className="h-4 bg-border animate-pulse mb-3" />
+              <div className="h-6 bg-border animate-pulse" />
             </div>
             <div className="w-full flex justify-between gap-6">
               <div className="flex gap-3">
-                <div className="w-10 h-10 border border-gray-600 animate-pulse" />
-                <div className="w-16 h-10 border border-gray-600 animate-pulse" />
-                <div className="w-10 h-10 border border-gray-600 animate-pulse" />
+                <div className="w-10 h-10 bg-border animate-pulse" />
+                <div className="w-16 h-10 bg-border animate-pulse" />
+                <div className="w-10 h-10 bg-border animate-pulse" />
               </div>
-              <div className="w-32 h-10 border border-gray-600 animate-pulse" />
+              <div className="w-32 h-10 bg-border animate-pulse" />
             </div>
           </div>
         </DialogContent>
