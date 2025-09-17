@@ -53,15 +53,6 @@ A modern, full-stack e-commerce platform built with React, Node.js, and MongoDB.
    npm install
    ```
 
-3. **Environment Setup**
-   
-   Create a `.env` file in the `backend` directory:
-   ```env
-   MONGODB_URI=mongodb://localhost:27017/neomall
-   JWT_SECRET=your-super-secret-jwt-key-here
-   PORT=5000
-   ```
-
 4. **Start the development servers**
 
    **Option 1: Manual Start (Recommended for development)**
@@ -72,27 +63,6 @@ A modern, full-stack e-commerce platform built with React, Node.js, and MongoDB.
 
    # Terminal 2 - Start Frontend
    cd frontend
-   npm run dev
-   ```
-
-   **Option 2: Automated Start (Using npm scripts)**
-   
-   Add this script to the root `package.json`:
-   ```json
-   {
-     "scripts": {
-       "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
-       "install-all": "npm install --prefix backend && npm install --prefix frontend"
-     }
-   }
-   ```
-   
-   Then run:
-   ```bash
-   # Install all dependencies
-   npm run install-all
-   
-   # Start both servers
    npm run dev
    ```
 
@@ -130,26 +100,6 @@ A modern, full-stack e-commerce platform built with React, Node.js, and MongoDB.
 - **Username**: `testShipperDaNang`
 - **Password**: `testShipperDaNang123!`
 - **Distribution Hub**: Da Nang
-
-**Shipper Features**: View assigned orders, update delivery status, manage distribution hub
-
-## 🛠️ Development Scripts
-
-### Backend Scripts
-```bash
-cd backend
-npm run dev          # Start development server with nodemon
-npm start           # Start production server
-npm run seed        # Seed database with sample data
-```
-
-### Frontend Scripts
-```bash
-cd frontend
-npm run dev         # Start Vite development server
-npm run build       # Build for production
-npm run preview     # Preview production build
-```
 
 ## 📁 Project Structure
 
@@ -213,25 +163,6 @@ fullstack-ecommerce-2025B/
 - Order assignment and tracking
 - Delivery status updates
 - Customer information access
-
-## 🚀 Deployment
-
-### Backend Deployment
-1. Set up MongoDB Atlas or local MongoDB instance
-2. Configure environment variables
-3. Deploy to platforms like Heroku, Railway, or DigitalOcean
-
-### Frontend Deployment
-1. Build the production bundle: `npm run build`
-2. Deploy to platforms like Vercel, Netlify, or AWS S3
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Commit changes: `git commit -m 'Add feature'`
-4. Push to branch: `git push origin feature-name`
-5. Submit a pull request
 
 ## 📝 License
 
